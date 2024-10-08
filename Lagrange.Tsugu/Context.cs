@@ -22,5 +22,5 @@ public class Context(
 
     public MessageChain Chain => messageChain;
 
-    public SugaredHttpClient Rest => new(httpClientFactory, loggerFactory);
+    public SugaredHttpClient Rest => new(httpClientFactory, loggerFactory, appSettings);
 }

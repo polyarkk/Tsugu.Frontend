@@ -6,16 +6,20 @@ using System.Text;
 namespace Lagrange.Tsugu.Api;
 
 public class SugaredHttpClient : IDisposable {
-    private const string ApiUrl = "http://tsugubot.com:8080";
-    // private const string ApiUrl = "http://localhost:3000";
+    private readonly AppSettings _appSettings;
 
     private readonly HttpClient _httpClient;
 
     private readonly ILogger _logger;
 
-    public SugaredHttpClient(IHttpClientFactory httpClientFactory, ILoggerFactory loggerFactory) {
+    public SugaredHttpClient(
+        IHttpClientFactory httpClientFactory,
+        ILoggerFactory loggerFactory,
+        AppSettings appSettings
+    ) {
         _httpClient = httpClientFactory.CreateClient();
         _logger = loggerFactory.CreateLogger("Lagrange.Tsugu.Api.SugaredHttpClient");
+        _appSettings = appSettings;
     }
 
     public void Dispose() {
@@ -28,7 +32,7 @@ public class SugaredHttpClient : IDisposable {
 
         _logger.LogInformation("endpoint: {ep}, json: {json}", endpoint, json);
 
-        HttpRequestMessage msg = new(HttpMethod.Post, $"{ApiUrl}{endpoint}");
+        HttpRequestMessage msg = new(HttpMethod.Post, $"{_appSettings.BackendUrl}{endpoint}");
 
         msg.Headers.Accept.Clear();
         msg.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -56,7 +60,7 @@ public class SugaredHttpClient : IDisposable {
 
         _logger.LogInformation("endpoint: {ep}, json: {json}", endpoint, json);
 
-        HttpRequestMessage msg = new(HttpMethod.Post, $"{ApiUrl}{endpoint}");
+        HttpRequestMessage msg = new(HttpMethod.Post, $"{_appSettings.BackendUrl}{endpoint}");
 
         msg.Headers.Accept.Clear();
         msg.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

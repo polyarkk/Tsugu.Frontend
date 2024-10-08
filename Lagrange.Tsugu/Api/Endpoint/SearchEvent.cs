@@ -3,15 +3,15 @@
 namespace Lagrange.Tsugu.Api.Endpoint;
 
 [ApiCommand(
-    Alias = "查卡",
+    Alias = "查活动",
     Description = """
-                  查询指定卡面的信息，或查询符合条件的卡面列表
-                  查卡 1399：返回1399号卡面的信息
-                  查卡 红 ars 4x：返回角色为ars，稀有度为4星的卡面列表
+                  查询指定活动的信息，或查询符合条件的活动列表。
+                  查活动 253：返回253期活动的信息
+                  查活动 ag 蓝：返回Afterglow乐队、Cool属性的活动列表
                   """,
     UsageHint = "<关键词>"
 )]
-public class SearchCard : BaseCommand {
+public class SearchEvent : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {
         string arg = args.ConcatenatedArgs;
 
@@ -30,7 +30,7 @@ public class SearchCard : BaseCommand {
 
         await rest.InjectFuzzySearchResult(p, arg);
 
-        RestResponse response = (await rest.TsuguPost("/searchCard", p))[0];
+        RestResponse response = (await rest.TsuguPost("/searchEvent", p))[0];
 
         if (response.IsImageBase64()) {
             await ctx.SendImage(response.String!);

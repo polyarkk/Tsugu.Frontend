@@ -3,6 +3,11 @@
 [Serializable]
 public class AppSettings {
     /// <summary>
+    /// Tsugu 后端地址
+    /// </summary>
+    public string BackendUrl { get; set; } = "http://tsugubot.com:8080";
+    
+    /// <summary>
     /// 是否启用白名单模式，启用后只允许与 Groups 和 Friends 中列出的群或用户对话
     /// </summary>
     public bool Whitelisted { get; set; } = true;
