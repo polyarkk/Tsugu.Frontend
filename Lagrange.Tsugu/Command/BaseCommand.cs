@@ -5,7 +5,7 @@ namespace Lagrange.Tsugu.Command;
 public abstract class BaseCommand {
     public abstract Task Invoke(Context ctx, ParsedCommand args);
 
-    private ApiCommand GetAttribute() {
+    public ApiCommand GetAttribute() {
         return GetType().GetCustomAttribute<ApiCommand>()!;
     }
 

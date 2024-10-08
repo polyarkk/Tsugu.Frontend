@@ -27,6 +27,11 @@ public class AppSettings {
     /// </summary>
     public bool Compress { get; set; } = true;
 
+    /// <summary>
+    /// 群聊天是否需要被@才会触发指令
+    /// </summary>
+    public bool NeedMentioned { get; set; } = false;
+
     public bool IsGroupWhitelisted(uint? groupUin) {
         // 忽略私聊情况
         if (groupUin == null) {

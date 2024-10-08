@@ -2,6 +2,7 @@
 using Lagrange.Core.Event;
 using Lagrange.Core.Event.EventArg;
 using Lagrange.Core.Message;
+using Lagrange.Core.Message.Entity;
 using Lagrange.Tsugu.Command;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -39,7 +40,7 @@ public class MessageResolver {
 
     private void LoadEndpoints() {
         _apis.Clear();
-        
+
         var typesWithApiCommand =
             from a in AppDomain.CurrentDomain.GetAssemblies()
             from t in a.GetTypes()
@@ -66,8 +67,10 @@ public class MessageResolver {
         stringBuilder.AppendLine("当前默认服务器：CN\n可用指令：");
 
         foreach (ApiCommand attr in _apis.Values.Select(at => at.GetCustomAttribute<ApiCommand>()!)) {
-            stringBuilder.AppendLine($"{attr.Alias} {attr.UsageHint}\n{attr.Description}\n");
+            stringBuilder.AppendLine($"{attr.Alias} {attr.UsageHint}");
         }
+
+        stringBuilder.AppendLine("* 指令尾随 --help 将输出指令的详细帮助");
 
         stringBuilder.Remove(stringBuilder.Length - 2, 2);
 
@@ -88,6 +91,20 @@ public class MessageResolver {
             return;
         }
 
+        if (@event is GroupMessageEvent && _appSettings.NeedMentioned) {
+            foreach (IMessageEntity entity in messageChain) {
+                if (entity is not MentionEntity me || me.Uin != botContext.BotUin) {
+                    continue;
+                }
+
+                _logger.LogInformation("message from [{uin}] won't handle because it did not mention bot",
+                    messageChain.FriendUin
+                );
+
+                return;
+            }
+        }
+
         string[] tokens = prompt.Split(" ");
 
         if (tokens.Length == 0) {
@@ -95,10 +112,10 @@ public class MessageResolver {
         }
 
         Context context = new(_appSettings, botContext, @event, messageChain, _httpClientFactory, _loggerFactory);
-        
+
         if (string.Equals(tokens[0], "tsugu_reload_appsettings", StringComparison.OrdinalIgnoreCase)) {
             // todo
-            
+
             await context.SendPlainText("已重新加载配置信息");
 
             return;
@@ -107,7 +124,7 @@ public class MessageResolver {
 #if DEBUG
         if (string.Equals(tokens[0], "tsugu_reload_commands", StringComparison.OrdinalIgnoreCase)) {
             LoadEndpoints();
-            
+
             await context.SendPlainText("已重新加载指令集\n" + GetHelpPlainText());
 
             return;
@@ -137,6 +154,18 @@ public class MessageResolver {
         }
 
         BaseCommand api = (BaseCommand)ctor.Invoke(null);
+
+        if (tokens.Contains("--help")) {
+            ApiCommand attr = api.GetAttribute();
+
+            await context.SendPlainText($"""
+                                         {attr.Alias}{attr.UsageHint}
+                                         {attr.Description}
+                                         """
+            );
+
+            return;
+        }
 
         try {
             await api.Invoke(context, new ParsedCommand(tokens));
