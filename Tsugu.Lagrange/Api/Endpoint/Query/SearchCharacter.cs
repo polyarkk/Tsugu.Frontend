@@ -25,7 +25,7 @@ public class SearchCharacter : BaseCommand {
 
         Dictionary<string, object?> p = new() {
             ["displayedServerList"] = new[] { 3, 0 },
-            ["compress"] = ctx.Settings.Compress
+            ["compress"] = ctx.Settings.Compress,
         };
 
         using SugaredHttpClient rest = ctx.Rest;
