@@ -2,7 +2,7 @@
 
 [AttributeUsage(AttributeTargets.Class)]
 public class ApiCommand : Attribute {
-    public required string Alias { get; set; }
+    public required string[] Aliases { get; set; }
     
     public required string Description { get; set; }
     

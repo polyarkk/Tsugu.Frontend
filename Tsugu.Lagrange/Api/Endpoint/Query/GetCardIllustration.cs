@@ -3,9 +3,9 @@ using Lagrange.Core.Message;
 using Tsugu.Lagrange.Api.Rest;
 using Tsugu.Lagrange.Command;
 
-namespace Tsugu.Lagrange.Api.Endpoint;
+namespace Tsugu.Lagrange.Api.Endpoint.Query;
 
-[ApiCommand(Alias = "查卡面", Description = "获取卡面图片", UsageHint = "<卡面ID>")]
+[ApiCommand(Aliases = ["查卡面", "查插画"], Description = "获取卡面图片", UsageHint = "<卡面ID>")]
 public class GetCardIllustration : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {
         int? cardId = args.GetInt32(0);

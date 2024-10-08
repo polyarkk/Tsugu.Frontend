@@ -1,18 +1,18 @@
 ﻿using Tsugu.Lagrange.Api.Rest;
 using Tsugu.Lagrange.Command;
 
-namespace Tsugu.Lagrange.Api.Endpoint;
+namespace Tsugu.Lagrange.Api.Endpoint.Query;
 
 [ApiCommand(
-    Alias = "查曲",
+    Aliases = ["查卡"],
     Description = """
-                  根据关键词或曲目ID查询曲目信息
-                  查曲 1：返回1号曲的信息
-                  查曲 ag lv27：返回所有难度为27的ag曲列表
+                  查询指定卡面的信息，或查询符合条件的卡面列表
+                  查卡 1399：返回1399号卡面的信息
+                  查卡 红 ars 4x：返回角色为ars，稀有度为4星的卡面列表
                   """,
     UsageHint = "<关键词>"
 )]
-public class SearchSong : BaseCommand {
+public class SearchCard : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {
         string arg = args.ConcatenatedArgs;
 
@@ -24,6 +24,7 @@ public class SearchSong : BaseCommand {
 
         var p = new Dictionary<string, object?> {
             ["displayedServerList"] = new[] { 3, 0 },
+            ["useEasyBG"] = true,
             ["compress"] = ctx.Settings.Compress
         };
 
@@ -31,7 +32,7 @@ public class SearchSong : BaseCommand {
 
         await rest.InjectFuzzySearchResult(p, arg);
 
-        RestResponse response = (await rest.TsuguPost("/searchSong", p))[0];
+        RestResponse response = (await rest.TsuguPost("/searchCard", p))[0];
 
         if (response.IsImageBase64()) {
             await ctx.SendImage(response.String!);

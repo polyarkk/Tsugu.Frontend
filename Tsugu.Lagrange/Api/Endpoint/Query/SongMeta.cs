@@ -1,31 +1,24 @@
-﻿using Tsugu.Lagrange.Api.Rest;
+﻿using Tsugu.Lagrange.Api.Enum;
+using Tsugu.Lagrange.Api.Rest;
 using Tsugu.Lagrange.Command;
 
-namespace Tsugu.Lagrange.Api.Endpoint;
+namespace Tsugu.Lagrange.Api.Endpoint.Query;
 
 [ApiCommand(
-    Alias = "查卡池",
-    Description = "查询指定卡池的信息",
-    UsageHint = "<卡池ID>"
+    Aliases = ["查询分数表", "查分数表", "查询分数榜", "查分数榜"],
+    Description = "查询歌曲分数排行表",
+    UsageHint = "[cn|jp|tw|kr|en]"
 )]
-public class SearchGacha : BaseCommand {
+public class SongMeta : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {
-        if (!args.HasArgument(0)) {
-            await ctx.SendPlainText(GetErrorAndHelpText("未指定卡池ID！"));
-
-            return;
-        }
-
         var p = new Dictionary<string, object?> {
             ["displayedServerList"] = new[] { 3, 0 },
-            ["gachaId"] = args.GetInt32(0),
-            ["useEasyBG"] = true,
-            ["compress"] = ctx.Settings.Compress
+            ["mainServer"] = args.GetEnum<BandoriServer>(0) ?? BandoriServer.Cn
         };
 
         using SugaredHttpClient rest = ctx.Rest;
 
-        RestResponse response = (await rest.TsuguPost("/searchGacha", p))[0];
+        RestResponse response = (await rest.TsuguPost("/songMeta", p))[0];
 
         if (response.IsImageBase64()) {
             await ctx.SendImage(response.String!);

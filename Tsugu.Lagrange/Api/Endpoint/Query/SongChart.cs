@@ -2,10 +2,10 @@
 using Tsugu.Lagrange.Api.Rest;
 using Tsugu.Lagrange.Command;
 
-namespace Tsugu.Lagrange.Api.Endpoint;
+namespace Tsugu.Lagrange.Api.Endpoint.Query;
 
 [ApiCommand(
-    Alias = "查谱面",
+    Aliases = ["查谱面", "查铺面"],
     Description = """
                   根据曲目ID与难度查询铺面信息
                   查谱面 1：返回1号曲的ex难度谱面

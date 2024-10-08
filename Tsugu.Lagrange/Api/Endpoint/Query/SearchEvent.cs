@@ -1,10 +1,10 @@
 ﻿using Tsugu.Lagrange.Api.Rest;
 using Tsugu.Lagrange.Command;
 
-namespace Tsugu.Lagrange.Api.Endpoint;
+namespace Tsugu.Lagrange.Api.Endpoint.Query;
 
 [ApiCommand(
-    Alias = "查活动",
+    Aliases = ["查活动"],
     Description = """
                   查询指定活动的信息，或查询符合条件的活动列表。
                   查活动 253：返回253期活动的信息

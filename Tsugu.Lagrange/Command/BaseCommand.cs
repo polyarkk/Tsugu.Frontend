@@ -14,7 +14,7 @@ public abstract class BaseCommand {
 
         return $"""
                 错误：{error}
-                {attr.Alias} {attr.UsageHint}
+                {string.Join("|", attr.Aliases)} {attr.UsageHint}
                 {attr.Description}
                 """;
     }

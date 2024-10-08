@@ -2,10 +2,10 @@
 using Tsugu.Lagrange.Api.Rest;
 using Tsugu.Lagrange.Command;
 
-namespace Tsugu.Lagrange.Api.Endpoint;
+namespace Tsugu.Lagrange.Api.Endpoint.Query;
 
 [ApiCommand(
-    Alias = "查玩家",
+    Aliases = ["查玩家", "查询玩家"],
     Description = "查询指定服务器的指定玩家的状态图片，仅能查询到已公开的信息",
     UsageHint = "<玩家ID> [cn|jp|tw|kr|en]"
 )]

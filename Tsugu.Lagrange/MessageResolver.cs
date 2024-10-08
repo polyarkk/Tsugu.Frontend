@@ -57,17 +57,25 @@ public class MessageResolver {
                 continue;
             }
 
-            _apis[t.Attribute.Alias] = t.Type;
+            foreach (string alias in t.Attribute.Aliases) {
+                _apis[alias] = t.Type;
+            }
         }
     }
 
     private string GetHelpPlainText() {
         StringBuilder stringBuilder = new();
 
+        HashSet<Type> hashSet = [];
+
         stringBuilder.AppendLine("当前默认服务器：CN\n可用指令：");
 
-        foreach (ApiCommand attr in _apis.Values.Select(at => at.GetCustomAttribute<ApiCommand>()!)) {
-            stringBuilder.AppendLine($"{attr.Alias} {attr.UsageHint}");
+        foreach (ApiCommand attr in
+            from apiType in _apis.Values
+            where hashSet.Add(apiType)
+            select apiType.GetCustomAttribute<ApiCommand>()!
+        ) {
+            stringBuilder.AppendLine($"{string.Join("|", attr.Aliases)} {attr.UsageHint}");
         }
 
         stringBuilder.AppendLine("* 指令尾随 --help 将输出指令的详细帮助");
@@ -159,7 +167,7 @@ public class MessageResolver {
             ApiCommand attr = api.GetAttribute();
 
             await context.SendPlainText($"""
-                                         {attr.Alias}{attr.UsageHint}
+                                         {string.Join("|", attr.Aliases)} {attr.UsageHint}
                                          {attr.Description}
                                          """
             );
