@@ -1,4 +1,5 @@
-﻿using Lagrange.Tsugu.Command;
+﻿using Lagrange.Tsugu.Api.Rest;
+using Lagrange.Tsugu.Command;
 
 namespace Lagrange.Tsugu.Api.Endpoint;
 

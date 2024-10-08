@@ -1,4 +1,4 @@
-﻿namespace Lagrange.Tsugu.Api;
+﻿namespace Lagrange.Tsugu.Api.Enum;
 
 public enum BandoriServer {
     Jp,

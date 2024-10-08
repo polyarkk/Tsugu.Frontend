@@ -2,8 +2,6 @@
 using Lagrange.Core.Event;
 using Lagrange.Core.Event.EventArg;
 using Lagrange.Core.Message;
-using Lagrange.Tsugu.Api;
-using Lagrange.Tsugu.Api.Endpoint;
 using Lagrange.Tsugu.Command;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -22,8 +20,6 @@ public class MessageResolver {
 
     private readonly ILoggerFactory _loggerFactory;
 
-    private readonly IConfiguration _configuration;
-
     private readonly AppSettings _appSettings;
 
     public MessageResolver(
@@ -36,7 +32,6 @@ public class MessageResolver {
         _apis = new Dictionary<string, Type>();
         _httpClientFactory = httpClientFactory;
         _loggerFactory = loggerFactory;
-        _configuration = configuration;
         _appSettings = configuration.GetSection("Tsugu").Get<AppSettings>()!;
 
         LoadEndpoints();

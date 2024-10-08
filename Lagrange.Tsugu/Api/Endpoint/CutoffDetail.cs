@@ -1,4 +1,6 @@
-﻿using Lagrange.Tsugu.Command;
+﻿using Lagrange.Tsugu.Api.Enum;
+using Lagrange.Tsugu.Api.Rest;
+using Lagrange.Tsugu.Command;
 
 namespace Lagrange.Tsugu.Api.Endpoint;
 
@@ -15,9 +17,9 @@ public class CutoffDetail : BaseCommand {
             return;
         }
 
-        Dictionary<string, object?> p = new();
-
-        p["tier"] = args.GetInt32(0);
+        Dictionary<string, object?> p = new() {
+            ["tier"] = args.GetInt32(0)
+        };
 
         if (args.HasArgument(1)) {
             p["eventId"] = args.GetBoolean(1);

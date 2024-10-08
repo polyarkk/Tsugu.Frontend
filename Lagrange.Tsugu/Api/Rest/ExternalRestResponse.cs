@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Lagrange.Tsugu.Api;
+namespace Lagrange.Tsugu.Api.Rest;
 
 public class ExternalRestResponse<TData> {
     public ExternalRestResponse(string status, TData data) {

@@ -5,12 +5,12 @@ using Microsoft.Extensions.Hosting;
 using System.Text.Json;
 
 if (!File.Exists("appsettings.json")) {
-    var conf = new Dictionary<string, dynamic>() {
+    var conf = new Dictionary<string, dynamic> {
         ["Tsugu"] = new AppSettings(),
     };
 
 #pragma warning disable CA1869
-    JsonSerializerOptions options = new JsonSerializerOptions() {
+    JsonSerializerOptions options = new() {
         WriteIndented = true
     };
 #pragma warning restore CA1869

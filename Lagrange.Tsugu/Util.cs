@@ -10,9 +10,9 @@ internal static class Util {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    public static T? DeserializeJson<T>(string json) { return JsonSerializer.Deserialize<T>(json, JsonConfig); }
+    public static T? DeserializeJson<T>(this string json) { return JsonSerializer.Deserialize<T>(json, JsonConfig); }
 
-    public static string SerializeJson<T>(T obj) { return JsonSerializer.Serialize(obj, JsonConfig); }
+    public static string SerializeJson<T>(this T obj) { return JsonSerializer.Serialize(obj, JsonConfig); }
     
     public static MessageBuilder GetDefaultMessageBuilder(Context ctx) {
         return ctx.Event is GroupMessageEvent

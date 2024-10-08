@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace Lagrange.Tsugu.Api;
+namespace Lagrange.Tsugu.Api.Rest;
 
 public class SugaredHttpClient : IDisposable {
     private readonly AppSettings _appSettings;
@@ -28,7 +28,7 @@ public class SugaredHttpClient : IDisposable {
     }
 
     public async Task<List<RestResponse>> TsuguPost(string endpoint, Dictionary<string, object?> bodyParams) {
-        string json = Util.SerializeJson(bodyParams);
+        string json = bodyParams.SerializeJson();
 
         _logger.LogInformation("endpoint: {ep}, json: {json}", endpoint, json);
 
@@ -43,7 +43,7 @@ public class SugaredHttpClient : IDisposable {
         string content = await response.Content.ReadAsStringAsync();
 
         if (response.StatusCode == HttpStatusCode.OK) {
-            return Util.DeserializeJson<List<RestResponse>>(content)!;
+            return content.DeserializeJson<List<RestResponse>>()!;
         }
 
         _logger.LogError("failed to fetch data from endpoint [{ep}], status: {status}, message: {msg}",
@@ -56,7 +56,7 @@ public class SugaredHttpClient : IDisposable {
     public async Task<ExternalRestResponse<TData>> ExternalPost<TData>(
         string endpoint, Dictionary<string, object> bodyParams
     ) where TData : new() {
-        string json = Util.SerializeJson(bodyParams);
+        string json = bodyParams.SerializeJson();
 
         _logger.LogInformation("endpoint: {ep}, json: {json}", endpoint, json);
 
@@ -71,7 +71,7 @@ public class SugaredHttpClient : IDisposable {
         string content = await response.Content.ReadAsStringAsync();
 
         if (response.StatusCode == HttpStatusCode.OK) {
-            return Util.DeserializeJson<ExternalRestResponse<TData>>(content)!;
+            return content.DeserializeJson<ExternalRestResponse<TData>>()!;
         }
 
         _logger.LogError("failed to fetch data from external endpoint [{ep}], status: {status}, message: {msg}",

@@ -1,9 +1,8 @@
-﻿using Lagrange.Tsugu.Command;
-using System.Reflection;
+﻿using System.Reflection;
 
-namespace Lagrange.Tsugu.Api;
+namespace Lagrange.Tsugu.Command;
 
-public abstract class BaseCommand : ICommand {
+public abstract class BaseCommand {
     public abstract Task Invoke(Context ctx, ParsedCommand args);
 
     private ApiCommand GetAttribute() {
