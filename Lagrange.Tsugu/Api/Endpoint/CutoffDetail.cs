@@ -11,9 +11,7 @@ namespace Lagrange.Tsugu.Api.Endpoint;
 public class CutoffDetail : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {
         if (!args.HasArgument(0)) {
-            ApiCommand attr = GetAttribute();
-            
-            await ctx.SendPlainText($"错误：未指定排名档位！用法：{attr.Alias} {attr.UsageHint}");
+            await ctx.SendPlainText(GetErrorAndHelpText("未指定档位！"));
 
             return;
         }
@@ -32,7 +30,7 @@ public class CutoffDetail : BaseCommand {
 
         using SugaredHttpClient rest = ctx.Rest;
 
-        RestResponse response = await rest.TsuguPost("/cutoffDetail", p);
+        RestResponse response = (await rest.TsuguPost("/cutoffDetail", p))[0];
 
         if (response.IsImageBase64()) {
             await ctx.SendImage(response.String!);

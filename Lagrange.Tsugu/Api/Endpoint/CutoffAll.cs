@@ -21,7 +21,7 @@ public class CutoffAll : BaseCommand {
 
         using SugaredHttpClient rest = ctx.Rest;
 
-        RestResponse response = await rest.TsuguPost("/cutoffAll", p);
+        RestResponse response = (await rest.TsuguPost("/cutoffAll", p))[0];
 
         if (response.IsImageBase64()) {
             await ctx.SendImage(response.String!);

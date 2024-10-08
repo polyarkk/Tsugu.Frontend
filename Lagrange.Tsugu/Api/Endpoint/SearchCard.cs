@@ -16,12 +16,12 @@ public class SearchCard : BaseCommand {
         string arg = args.ConcatenatedArgs;
 
         if (string.IsNullOrWhiteSpace(arg)) {
-            await ctx.SendPlainText($"错误：未指定查询关键词！用法：{GetAttribute().Alias} {GetAttribute().UsageHint}");
+            await ctx.SendPlainText(GetErrorAndHelpText("未指定查询关键词！"));
 
             return;
         }
 
-        var p = new Dictionary<string, object> {
+        var p = new Dictionary<string, object?> {
             ["displayedServerList"] = new[] { 0, 3 },
             ["useEasyBG"] = true
         };
@@ -42,12 +42,12 @@ public class SearchCard : BaseCommand {
             p["fuzzySearchResult"] = fuzzySearchResult.Data!;
         }
 
-        RestResponse response = await rest.TsuguPost("/searchCard", p);
+        RestResponse response = (await rest.TsuguPost("/searchCard", p))[0];
 
         if (response.IsImageBase64()) {
             await ctx.SendImage(response.String!);
         } else {
-            await ctx.SendPlainText("错误：" + response.String! + "！");
+            await ctx.SendPlainText("错误：" + (response.String ?? "请求超时") + "！");
         }
     }
 }

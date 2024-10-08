@@ -1,5 +1,6 @@
 ﻿using Lagrange.Core;
 using Lagrange.Core.Event;
+using Lagrange.Core.Event.EventArg;
 using Lagrange.Core.Message;
 using Lagrange.Tsugu.Api;
 using Lagrange.Tsugu.Api.Endpoint;
@@ -21,6 +22,8 @@ public class MessageResolver {
 
     private readonly ILoggerFactory _loggerFactory;
 
+    private readonly IConfiguration _configuration;
+
     private readonly AppSettings _appSettings;
 
     public MessageResolver(
@@ -33,6 +36,7 @@ public class MessageResolver {
         _apis = new Dictionary<string, Type>();
         _httpClientFactory = httpClientFactory;
         _loggerFactory = loggerFactory;
+        _configuration = configuration;
         _appSettings = configuration.GetSection("Tsugu").Get<AppSettings>()!;
 
         LoadEndpoints();
@@ -81,8 +85,8 @@ public class MessageResolver {
         MessageChain messageChain,
         string prompt
     ) {
-        if (!_appSettings.IsFriendWhitelisted(messageChain.FriendUin)
-            || !_appSettings.IsGroupWhitelisted(messageChain.GroupUin)
+        if ((@event is FriendMessageEvent && !_appSettings.IsFriendWhitelisted(messageChain.FriendUin))
+            || (@event is GroupMessageEvent && !_appSettings.IsGroupWhitelisted(messageChain.GroupUin))
         ) {
             _logger.LogInformation("message from [{uin}] won't handle due to app settings", messageChain.FriendUin);
 
@@ -96,14 +100,24 @@ public class MessageResolver {
         }
 
         Context context = new(_appSettings, botContext, @event, messageChain, _httpClientFactory, _loggerFactory);
+        
+        if (string.Equals(tokens[0], "tsugu_reload_appsettings", StringComparison.OrdinalIgnoreCase)) {
+            // todo
+            
+            await context.SendPlainText("已重新加载配置信息");
 
-        if (string.Equals(tokens[0], "tsugu_reload", StringComparison.OrdinalIgnoreCase)) {
+            return;
+        }
+
+#if DEBUG
+        if (string.Equals(tokens[0], "tsugu_reload_commands", StringComparison.OrdinalIgnoreCase)) {
             LoadEndpoints();
             
             await context.SendPlainText("已重新加载指令集，" + GetHelpPlainText());
 
             return;
         }
+#endif
 
         if (string.Equals(tokens[0], "tsugu_help", StringComparison.OrdinalIgnoreCase)) {
             await context.SendPlainText(GetHelpPlainText());
@@ -127,10 +141,12 @@ public class MessageResolver {
             return;
         }
 
-        ICommand api = (ICommand)ctor.Invoke(null);
+        BaseCommand api = (BaseCommand)ctor.Invoke(null);
 
         try {
             await api.Invoke(context, new ParsedCommand(tokens));
+        } catch (CommandParseException e) {
+            await context.SendPlainText(api.GetErrorAndHelpText(e.Message));
         } catch (Exception e) {
             _logger.LogError("exception raised upon resolving command!\n{e}", e.ToString());
         }

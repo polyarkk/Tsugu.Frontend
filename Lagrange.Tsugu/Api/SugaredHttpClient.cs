@@ -6,8 +6,8 @@ using System.Text;
 namespace Lagrange.Tsugu.Api;
 
 public class SugaredHttpClient : IDisposable {
-    // private const string ApiUrl = "http://tsugubot.com:8080";
-    private const string ApiUrl = "http://localhost:3000";
+    private const string ApiUrl = "http://tsugubot.com:8080";
+    // private const string ApiUrl = "http://localhost:3000";
 
     private readonly HttpClient _httpClient;
 
@@ -23,7 +23,7 @@ public class SugaredHttpClient : IDisposable {
         _httpClient.Dispose();
     }
 
-    public async Task<RestResponse> TsuguPost(string endpoint, Dictionary<string, object?> bodyParams) {
+    public async Task<List<RestResponse>> TsuguPost(string endpoint, Dictionary<string, object?> bodyParams) {
         string json = Util.SerializeJson(bodyParams);
 
         _logger.LogInformation("endpoint: {ep}, json: {json}", endpoint, json);
@@ -39,14 +39,14 @@ public class SugaredHttpClient : IDisposable {
         string content = await response.Content.ReadAsStringAsync();
 
         if (response.StatusCode == HttpStatusCode.OK) {
-            return Util.DeserializeJson<List<RestResponse>>(content)![0];
+            return Util.DeserializeJson<List<RestResponse>>(content)!;
         }
 
         _logger.LogError("failed to fetch data from endpoint [{ep}], status: {status}, message: {msg}",
             endpoint, response.StatusCode, content
         );
 
-        return new RestResponse("string", "");
+        return [new RestResponse("string", "")];
     }
 
     public async Task<ExternalRestResponse<TData>> ExternalPost<TData>(

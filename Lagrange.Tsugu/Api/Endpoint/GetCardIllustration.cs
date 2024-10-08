@@ -1,4 +1,6 @@
-﻿using Lagrange.Tsugu.Command;
+﻿using Lagrange.Core.Common.Interface.Api;
+using Lagrange.Core.Message;
+using Lagrange.Tsugu.Command;
 
 namespace Lagrange.Tsugu.Api.Endpoint;
 
@@ -8,22 +10,30 @@ public class GetCardIllustration : BaseCommand {
         int? cardId = args.GetInt32(0);
 
         if (cardId == null) {
-            await ctx.SendPlainText($"错误：未指定卡面 ID！用法：{GetAttribute().Alias} {GetAttribute().UsageHint}");
+            await ctx.SendPlainText(GetErrorAndHelpText("未指定卡面ID！"));
 
             return;
         }
 
         using SugaredHttpClient rest = ctx.Rest;
 
-        RestResponse response = await rest.TsuguPost(
+        var responses = await rest.TsuguPost(
             "/getCardIllustration",
             new Dictionary<string, object?> { ["cardId"] = cardId }
         );
 
-        if (response.IsImageBase64()) {
-            await ctx.SendImage(response.String!);
-        } else {
+        if (responses.Count == 1 && !responses[0].IsImageBase64()) {
             await ctx.SendPlainText("错误：卡面不存在！");
+            
+            return;
         }
+
+        MessageBuilder messageBuilder = Util.GetDefaultMessageBuilder(ctx);
+
+        foreach (RestResponse response in responses.Where(response => response.IsImageBase64())) {
+            messageBuilder.Image(Convert.FromBase64String(response.String!));
+        }
+
+        await ctx.Bot.SendMessage(messageBuilder.Build());
     }
 }
