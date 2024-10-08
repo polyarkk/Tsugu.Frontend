@@ -61,6 +61,20 @@ public class MessageResolver {
         }
     }
 
+    private string GetHelpPlainText() {
+        StringBuilder stringBuilder = new();
+
+        stringBuilder.AppendLine("可用指令：");
+
+        foreach (ApiCommand attr in _apis.Values.Select(at => at.GetCustomAttribute<ApiCommand>()!)) {
+            stringBuilder.AppendLine($"{attr.Alias} {attr.UsageHint}\n{attr.Description}\n");
+        }
+
+        stringBuilder.Remove(stringBuilder.Length - 2, 2);
+
+        return stringBuilder.ToString();
+    }
+
     public async Task InvokeCommand(
         BotContext botContext,
         EventBase @event,
@@ -81,28 +95,18 @@ public class MessageResolver {
             return;
         }
 
-        Context context = new(botContext, @event, messageChain, _httpClientFactory, _loggerFactory);
+        Context context = new(_appSettings, botContext, @event, messageChain, _httpClientFactory, _loggerFactory);
 
-        if (string.Equals(tokens[0], "tsugureload", StringComparison.OrdinalIgnoreCase)) {
+        if (string.Equals(tokens[0], "tsugu_reload", StringComparison.OrdinalIgnoreCase)) {
             LoadEndpoints();
             
-            await context.SendPlainText("已重新加载指令集");
+            await context.SendPlainText("已重新加载指令集，" + GetHelpPlainText());
 
             return;
         }
 
-        if (string.Equals(tokens[0], "tsuguhelp", StringComparison.OrdinalIgnoreCase)) {
-            StringBuilder stringBuilder = new();
-
-            stringBuilder.AppendLine("可用指令：");
-
-            foreach (ApiCommand attr in _apis.Values.Select(at => at.GetCustomAttribute<ApiCommand>()!)) {
-                stringBuilder.AppendLine($"{attr.Name}: {attr.Alias} {attr.UsageHint}");
-            }
-
-            stringBuilder.Remove(stringBuilder.Length - 1, 1);
-
-            await context.SendPlainText(stringBuilder.ToString());
+        if (string.Equals(tokens[0], "tsugu_help", StringComparison.OrdinalIgnoreCase)) {
+            await context.SendPlainText(GetHelpPlainText());
 
             return;
         }

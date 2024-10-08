@@ -2,7 +2,7 @@
 
 namespace Lagrange.Tsugu.Api.Endpoint;
 
-[ApiCommand(Alias = "查卡面", Name = "获取卡面图片", UsageHint = "<卡面ID>")]
+[ApiCommand(Alias = "查卡面", Description = "获取卡面图片", UsageHint = "<卡面ID>")]
 public class GetCardIllustration : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {
         int? cardId = args.GetInt32(0);
@@ -15,7 +15,7 @@ public class GetCardIllustration : BaseCommand {
 
         using SugaredHttpClient rest = ctx.Rest;
 
-        RestResponse response = await rest.Post(
+        RestResponse response = await rest.TsuguPost(
             "/getCardIllustration",
             new Dictionary<string, object?> { ["cardId"] = cardId }
         );

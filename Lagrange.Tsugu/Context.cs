@@ -7,12 +7,15 @@ using Microsoft.Extensions.Logging;
 namespace Lagrange.Tsugu;
 
 public class Context(
+    AppSettings appSettings,
     BotContext botContext,
     EventBase @event,
     MessageChain messageChain,
     IHttpClientFactory httpClientFactory,
     ILoggerFactory loggerFactory
 ) {
+    public AppSettings Settings => appSettings;
+    
     public BotContext Bot => botContext;
 
     public EventBase Event => @event;

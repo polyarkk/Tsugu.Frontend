@@ -23,7 +23,7 @@ public class SugaredHttpClient : IDisposable {
         _httpClient.Dispose();
     }
 
-    public async Task<RestResponse> Post(string endpoint, Dictionary<string, object?> bodyParams) {
+    public async Task<RestResponse> TsuguPost(string endpoint, Dictionary<string, object?> bodyParams) {
         string json = Util.SerializeJson(bodyParams);
 
         _logger.LogInformation("endpoint: {ep}, json: {json}", endpoint, json);
@@ -49,7 +49,31 @@ public class SugaredHttpClient : IDisposable {
         return new RestResponse("string", "");
     }
 
-    public async Task<RestResponse> Get(string endpoint, Dictionary<string, object> bodyParams) {
-        throw new NotImplementedException();
+    public async Task<ExternalRestResponse<TData>> ExternalPost<TData>(
+        string endpoint, Dictionary<string, object> bodyParams
+    ) where TData : new() {
+        string json = Util.SerializeJson(bodyParams);
+
+        _logger.LogInformation("endpoint: {ep}, json: {json}", endpoint, json);
+
+        HttpRequestMessage msg = new(HttpMethod.Post, $"{ApiUrl}{endpoint}");
+
+        msg.Headers.Accept.Clear();
+        msg.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        msg.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        HttpResponseMessage response = await _httpClient.SendAsync(msg);
+
+        string content = await response.Content.ReadAsStringAsync();
+
+        if (response.StatusCode == HttpStatusCode.OK) {
+            return Util.DeserializeJson<ExternalRestResponse<TData>>(content)!;
+        }
+
+        _logger.LogError("failed to fetch data from external endpoint [{ep}], status: {status}, message: {msg}",
+            endpoint, response.StatusCode, content
+        );
+
+        return new ExternalRestResponse<TData>("failed", new TData());
     }
 }

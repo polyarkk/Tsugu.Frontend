@@ -17,6 +17,11 @@ public class AppSettings {
     /// </summary>
     public uint[] Friends { get; set; } = [];
 
+    /// <summary>
+    /// 默认返回时压缩图片
+    /// </summary>
+    public bool Compress { get; set; } = true;
+
     public bool IsGroupWhitelisted(uint? groupUin) {
         // 忽略私聊情况
         if (groupUin == null) {

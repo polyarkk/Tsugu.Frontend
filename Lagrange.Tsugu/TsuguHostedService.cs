@@ -165,9 +165,12 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
         }
 
         StringBuilder sb = new();
-        sb.AppendLine($"user           : {chain.FriendInfo?.Nickname}({chain.FriendInfo?.Uin})");
+        
         if (chain.GroupUin != null) {
             sb.AppendLine($"group          : {chain.GroupUin}");
+            sb.AppendLine($"user           : {chain.GroupMemberInfo?.MemberName}({chain.GroupMemberInfo?.Uin})");
+        } else {
+            sb.AppendLine($"user           : {chain.FriendInfo?.Nickname}({chain.FriendInfo?.Uin})");
         }
 
         StringBuilder promptBuilder = new();

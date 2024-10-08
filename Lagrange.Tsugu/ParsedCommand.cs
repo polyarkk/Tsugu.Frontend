@@ -3,6 +3,8 @@
 public class ParsedCommand {
     private readonly string[] _args;
 
+    public string ConcatenatedArgs => string.Join(" ", _args);
+
     public string Alias { get; set; }
 
     public ParsedCommand(string[] args) {
