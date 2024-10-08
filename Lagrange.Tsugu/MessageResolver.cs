@@ -63,7 +63,7 @@ public class MessageResolver {
     private string GetHelpPlainText() {
         StringBuilder stringBuilder = new();
 
-        stringBuilder.AppendLine("可用指令：");
+        stringBuilder.AppendLine("当前默认服务器：CN\n可用指令：");
 
         foreach (ApiCommand attr in _apis.Values.Select(at => at.GetCustomAttribute<ApiCommand>()!)) {
             stringBuilder.AppendLine($"{attr.Alias} {attr.UsageHint}\n{attr.Description}\n");
@@ -108,7 +108,7 @@ public class MessageResolver {
         if (string.Equals(tokens[0], "tsugu_reload_commands", StringComparison.OrdinalIgnoreCase)) {
             LoadEndpoints();
             
-            await context.SendPlainText("已重新加载指令集，" + GetHelpPlainText());
+            await context.SendPlainText("已重新加载指令集\n" + GetHelpPlainText());
 
             return;
         }
