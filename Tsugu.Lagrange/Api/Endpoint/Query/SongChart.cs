@@ -21,7 +21,7 @@ public class SongChart : BaseCommand {
             return;
         }
 
-        var p = new Dictionary<string, object?> {
+        Dictionary<string, object?> p = new() {
             ["displayedServerList"] = new[] { 3, 0 },
             ["songId"] = args.GetInt32(0),
             ["compress"] = ctx.Settings.Compress

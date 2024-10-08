@@ -18,7 +18,7 @@ public class GetCardIllustration : BaseCommand {
 
         using SugaredHttpClient rest = ctx.Rest;
 
-        var responses = await rest.TsuguPost(
+        List<RestResponse> responses = await rest.TsuguPost(
             "/getCardIllustration",
             new Dictionary<string, object?> { ["cardId"] = cardId }
         );

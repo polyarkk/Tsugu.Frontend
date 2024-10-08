@@ -7,6 +7,7 @@ namespace Tsugu.Lagrange.Api.Endpoint.Query;
     Aliases = ["查活动"],
     Description = """
                   查询指定活动的信息，或查询符合条件的活动列表。
+                  使用示例:
                   查活动 253：返回253期活动的信息
                   查活动 ag 蓝：返回Afterglow乐队、Cool属性的活动列表
                   """,
@@ -22,7 +23,7 @@ public class SearchEvent : BaseCommand {
             return;
         }
 
-        var p = new Dictionary<string, object?> {
+        Dictionary<string, object?> p = new() {
             ["displayedServerList"] = new[] { 3, 0 },
             ["useEasyBG"] = true,
             ["compress"] = ctx.Settings.Compress

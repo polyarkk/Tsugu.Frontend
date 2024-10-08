@@ -86,7 +86,7 @@ public class SugaredHttpClient : IDisposable {
             p["text"] = arg;
         } else {
             // listed fuzzy search
-            var fuzzySearchResult =
+            ExternalRestResponse<Dictionary<string, object>> fuzzySearchResult =
                 await ExternalPost<Dictionary<string, object>>("/fuzzySearch",
                     new Dictionary<string, object> {
                         ["text"] = arg

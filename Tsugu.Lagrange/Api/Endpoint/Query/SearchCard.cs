@@ -7,6 +7,7 @@ namespace Tsugu.Lagrange.Api.Endpoint.Query;
     Aliases = ["查卡"],
     Description = """
                   查询指定卡面的信息，或查询符合条件的卡面列表
+                  使用示例:
                   查卡 1399：返回1399号卡面的信息
                   查卡 红 ars 4x：返回角色为ars，稀有度为4星的卡面列表
                   """,
@@ -22,7 +23,7 @@ public class SearchCard : BaseCommand {
             return;
         }
 
-        var p = new Dictionary<string, object?> {
+        Dictionary<string, object?> p = new() {
             ["displayedServerList"] = new[] { 3, 0 },
             ["useEasyBG"] = true,
             ["compress"] = ctx.Settings.Compress

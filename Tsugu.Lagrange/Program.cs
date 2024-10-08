@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 using System.Text.Json;
 
 if (!File.Exists("appsettings.json")) {
-    var conf = new Dictionary<string, dynamic> {
+    Dictionary<string, dynamic> conf = new() {
         ["Tsugu"] = new AppSettings(),
     };
 

@@ -4,28 +4,35 @@ using Tsugu.Lagrange.Command;
 namespace Tsugu.Lagrange.Api.Endpoint.Query;
 
 [ApiCommand(
-    Aliases = ["查卡池"],
-    Description = "查询指定卡池的信息",
-    UsageHint = "<卡池ID>"
+    Aliases = ["查角色"],
+    Description = """
+                  根据角色名、乐队、昵称等查询角色信息
+                  使用示例:
+                  查角色 10：返回10号角色的信息
+                  查角色 吉他：返回所有角色模糊搜索标签中包含吉他的角色列表
+                  """,
+    UsageHint = "<关键词>"
 )]
-public class SearchGacha : BaseCommand {
+public class SearchCharacter : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {
-        if (!args.HasArgument(0)) {
-            await ctx.SendPlainText(GetErrorAndHelpText("未指定卡池ID！"));
+        string arg = args.ConcatenatedArgs;
+
+        if (string.IsNullOrWhiteSpace(arg)) {
+            await ctx.SendPlainText(GetErrorAndHelpText("未指定查询关键词！"));
 
             return;
         }
 
         Dictionary<string, object?> p = new() {
             ["displayedServerList"] = new[] { 3, 0 },
-            ["gachaId"] = args.GetInt32(0),
-            ["useEasyBG"] = true,
             ["compress"] = ctx.Settings.Compress
         };
 
         using SugaredHttpClient rest = ctx.Rest;
 
-        RestResponse response = (await rest.TsuguPost("/searchGacha", p))[0];
+        await rest.InjectFuzzySearchResult(p, arg);
+
+        RestResponse response = (await rest.TsuguPost("/searchCharacter", p))[0];
 
         if (response.IsImageBase64()) {
             await ctx.SendImage(response.String!);

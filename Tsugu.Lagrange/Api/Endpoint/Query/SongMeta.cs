@@ -11,7 +11,7 @@ namespace Tsugu.Lagrange.Api.Endpoint.Query;
 )]
 public class SongMeta : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {
-        var p = new Dictionary<string, object?> {
+        Dictionary<string, object?> p = new() {
             ["displayedServerList"] = new[] { 3, 0 },
             ["mainServer"] = args.GetEnum<BandoriServer>(0) ?? BandoriServer.Cn
         };

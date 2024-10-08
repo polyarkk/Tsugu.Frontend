@@ -17,7 +17,7 @@ public class SearchPlayer : BaseCommand {
             return;
         }
         
-        var p = new Dictionary<string, object?> {
+        Dictionary<string, object?> p = new() {
             ["playerId"] = args.GetInt32(0),
             ["mainServer"] = args.GetEnum<BandoriServer>(1) ?? BandoriServer.Cn,
             ["useEasyBG"] = true,

@@ -10,7 +10,7 @@ class B : A { }
 
 public class Playground {
     public static void Api() {
-        var conf = new ConfigurationBuilder()
+        IConfigurationRoot conf = new ConfigurationBuilder()
             .AddEnvironmentVariables()
             .AddJsonFile("appsettings.json")
             .Build();
