@@ -23,7 +23,8 @@ public class SearchEvent : BaseCommand {
 
         var p = new Dictionary<string, object?> {
             ["displayedServerList"] = new[] { 3, 0 },
-            ["useEasyBG"] = true
+            ["useEasyBG"] = true,
+            ["compress"] = ctx.Settings.Compress
         };
 
         using SugaredHttpClient rest = ctx.Rest;
@@ -36,7 +37,7 @@ public class SearchEvent : BaseCommand {
             await ctx.SendImage(response.String!);
         } else {
             await ctx.SendPlainText(
-                "错误：" + (string.IsNullOrWhiteSpace(response.String) ? "请求失败" : response.String) + "！"
+                (string.IsNullOrWhiteSpace(response.String) ? "错误：请求失败" : response.String) + "！"
             );
         }
     }
