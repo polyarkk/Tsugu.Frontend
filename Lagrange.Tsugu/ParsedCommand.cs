@@ -3,14 +3,14 @@
 public class ParsedCommand {
     private readonly string[] _args;
 
-    private string _command;
+    public string Alias { get; set; }
 
     public ParsedCommand(string[] args) {
         if (args.Length < 1) {
             throw new Exception("empty command");
         }
 
-        _command = args[0];
+        Alias = args[0];
         _args = args.Skip(1).ToArray();
     }
 
@@ -21,30 +21,30 @@ public class ParsedCommand {
     public int? GetInt32(int index) {
         string? v = GetString(index);
 
-        if (v == null) {
+        if (v == null || !int.TryParse(v, out int i)) {
             return null;
         }
 
-        return Convert.ToInt32(v);
+        return i;
     }
 
     public bool? GetBoolean(int index) {
         string? v = GetString(index);
 
-        if (v == null) {
+        if (v == null || !bool.TryParse(v, out bool b)) {
             return null;
         }
 
-        return Convert.ToBoolean(v);
+        return b;
     }
 
     public TEnum? GetEnum<TEnum>(int index) where TEnum : struct, Enum {
         string? v = GetString(index);
 
-        if (v == null) {
+        if (v == null || !Enum.TryParse(v, true, out TEnum e)) {
             return null;
         }
 
-        return Enum.Parse<TEnum>(v, true);
+        return e;
     }
 }

@@ -5,6 +5,7 @@ using Lagrange.Core.Common.Interface.Api;
 using Lagrange.Core.Event;
 using Lagrange.Core.Event.EventArg;
 using Lagrange.Core.Message;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using QRCoder;
@@ -24,7 +25,10 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
 
     private bool _needQrCodeLogin;
 
-    public TsuguHostedService(ILogger<TsuguHostedService> logger, MessageResolver messageResolver) {
+    public TsuguHostedService(
+        ILogger<TsuguHostedService> logger,
+        MessageResolver messageResolver
+    ) {
         _logger = logger;
         _logger.LogInformation("--- TSUGU FRONTEND IS NOW STARTING!!! ---");
         _messageResolver = messageResolver;
@@ -146,17 +150,12 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
     private async void OnMessageReceived<TMessageEvent>(BotContext ctx, TMessageEvent e)
     where TMessageEvent : EventBase {
         // todo separate audit logic to another method
-        StringBuilder sb = new();
         MessageChain chain;
 
         if (e is FriendMessageEvent fe) {
             chain = fe.Chain;
-            sb.AppendLine($"friend message from user {chain.FriendInfo?.Nickname}({chain.FriendInfo?.Uin})");
         } else if (e is GroupMessageEvent ge) {
             chain = ge.Chain;
-            sb.AppendLine(
-                $"group message from user {chain.GroupMemberInfo?.MemberName}({chain.GroupMemberInfo?.Uin}) in group {chain.GroupUin}"
-            );
         } else {
             return;
         }
@@ -165,15 +164,21 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
             return;
         }
 
+        StringBuilder sb = new();
+        sb.AppendLine($"user           : {chain.FriendInfo?.Nickname}({chain.FriendInfo?.Uin})");
+        if (chain.GroupUin != null) {
+            sb.AppendLine($"group          : {chain.GroupUin}");
+        }
+
         StringBuilder promptBuilder = new();
 
         foreach (IMessageEntity entity in chain) {
             promptBuilder.Append(entity.ToPreviewText());
         }
 
-        sb.Append($"prompt: {promptBuilder.ToString()}");
+        sb.Append($"preview text   : {promptBuilder.ToString()}");
 
-        _logger.LogInformation("new message - {msg}", sb.ToString());
+        _logger.LogInformation("{msg}", sb.ToString());
 
         await _messageResolver.InvokeCommand(ctx, e, chain, promptBuilder.ToString());
     }

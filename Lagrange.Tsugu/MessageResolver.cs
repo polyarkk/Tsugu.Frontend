@@ -4,6 +4,7 @@ using Lagrange.Core.Message;
 using Lagrange.Tsugu.Api;
 using Lagrange.Tsugu.Api.Endpoint;
 using Lagrange.Tsugu.Command;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 using System.Text;
@@ -20,30 +21,44 @@ public class MessageResolver {
 
     private readonly ILoggerFactory _loggerFactory;
 
+    private readonly AppSettings _appSettings;
+
     public MessageResolver(
         ILogger<MessageResolver> logger,
         IHttpClientFactory httpClientFactory,
-        ILoggerFactory loggerFactory
+        ILoggerFactory loggerFactory,
+        IConfiguration configuration
     ) {
         _logger = logger;
         _apis = new Dictionary<string, Type>();
         _httpClientFactory = httpClientFactory;
         _loggerFactory = loggerFactory;
+        _appSettings = configuration.GetSection("Tsugu").Get<AppSettings>()!;
 
-        RegisterApi<CutoffAll>();
-        RegisterApi<CutoffDetail>();
+        LoadEndpoints();
     }
 
-    private void RegisterApi<TCommand>() where TCommand : ICommand {
-        Type type = typeof(TCommand);
+    private void LoadEndpoints() {
+        _apis.Clear();
         
-        ApiCommand? attr = type.GetCustomAttribute<ApiCommand>();
+        var typesWithApiCommand =
+            from a in AppDomain.CurrentDomain.GetAssemblies()
+            from t in a.GetTypes()
+            let attributes = t.GetCustomAttributes(typeof(ApiCommand), true)
+            where attributes is { Length: > 0 }
+            select new { Attribute = attributes.Cast<ApiCommand>().First()!, Type = t };
 
-        if (attr == null) {
-            throw new Exception($"each command class needs a ApiCommand attribute given! ({nameof(TCommand)})");
+        foreach (var t in typesWithApiCommand) {
+            if (t.Type.BaseType != typeof(BaseCommand)) {
+                _logger.LogWarning("command [{type}] won't register because it does not inherit BaseCommand class",
+                    t.Type.Name
+                );
+
+                continue;
+            }
+
+            _apis[t.Attribute.Alias] = t.Type;
         }
-        
-        _apis[attr.Alias] = type;
     }
 
     public async Task InvokeCommand(
@@ -52,6 +67,14 @@ public class MessageResolver {
         MessageChain messageChain,
         string prompt
     ) {
+        if (!_appSettings.IsFriendWhitelisted(messageChain.FriendUin)
+            || !_appSettings.IsGroupWhitelisted(messageChain.GroupUin)
+        ) {
+            _logger.LogInformation("message from [{uin}] won't handle due to app settings", messageChain.FriendUin);
+
+            return;
+        }
+
         string[] tokens = prompt.Split(" ");
 
         if (tokens.Length == 0) {
@@ -59,6 +82,14 @@ public class MessageResolver {
         }
 
         Context context = new(botContext, @event, messageChain, _httpClientFactory, _loggerFactory);
+
+        if (string.Equals(tokens[0], "tsugureload", StringComparison.OrdinalIgnoreCase)) {
+            LoadEndpoints();
+            
+            await context.SendPlainText("已重新加载指令集");
+
+            return;
+        }
 
         if (string.Equals(tokens[0], "tsuguhelp", StringComparison.OrdinalIgnoreCase)) {
             StringBuilder stringBuilder = new();

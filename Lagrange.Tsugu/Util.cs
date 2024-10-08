@@ -13,7 +13,7 @@ internal static class Util {
     public static T? DeserializeJson<T>(string json) { return JsonSerializer.Deserialize<T>(json, JsonConfig); }
 
     public static string SerializeJson<T>(T obj) { return JsonSerializer.Serialize(obj, JsonConfig); }
-
+    
     public static MessageBuilder GetDefaultMessageBuilder(Context ctx) {
         return ctx.Event is GroupMessageEvent
             ? MessageBuilder.Group((uint)ctx.Chain.GroupUin!).Mention(ctx.Chain.FriendUin)

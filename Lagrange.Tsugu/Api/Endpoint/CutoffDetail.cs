@@ -1,20 +1,19 @@
 ﻿using Lagrange.Tsugu.Command;
+using System.Reflection;
 
 namespace Lagrange.Tsugu.Api.Endpoint;
 
 [ApiCommand(
     Alias = "ycx",
     Name = "查询指定档位预测线",
-    UsageHint = "<tier> [mainServer] [eventId] [compress]"
+    UsageHint = "<tier> [cn|jp|tw|kr|en] [eventId] [compress]"
 )]
-public class CutoffDetail : ICommand {
-    public string Name { get; set; } = "查询指定档位预测线";
-    public string Alias { get; set; } = "ycx";
-    public string HelpHint { get; set; } = "<tier> [mainServer] [eventId] [compress]";
-
-    public async Task Invoke(Context ctx, ParsedCommand args) {
+public class CutoffDetail : BaseCommand {
+    public async override Task Invoke(Context ctx, ParsedCommand args) {
         if (!args.HasArgument(0)) {
-            await ctx.SendPlainText($"错误：未指定排名档位！用法：{Alias} {HelpHint}");
+            ApiCommand attr = GetAttribute();
+            
+            await ctx.SendPlainText($"错误：未指定排名档位！用法：{attr.Alias} {attr.UsageHint}");
 
             return;
         }
