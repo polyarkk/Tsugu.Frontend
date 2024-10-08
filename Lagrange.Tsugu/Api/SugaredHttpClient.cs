@@ -76,4 +76,20 @@ public class SugaredHttpClient : IDisposable {
 
         return new ExternalRestResponse<TData>("failed", new TData());
     }
+
+    public async Task InjectFuzzySearchResult(Dictionary<string, object?> p, string arg) {
+        if (int.TryParse(arg, out _)) {
+            p["text"] = arg;
+        } else {
+            // listed fuzzy search
+            var fuzzySearchResult =
+                await ExternalPost<Dictionary<string, object>>("/fuzzySearch",
+                    new Dictionary<string, object> {
+                        ["text"] = arg
+                    }
+                );
+
+            p["fuzzySearchResult"] = fuzzySearchResult.Data!;
+        }
+    }
 }

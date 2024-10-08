@@ -2,11 +2,11 @@
 
 namespace Lagrange.Tsugu.Api.Endpoint;
 
-[ApiCommand(Alias = "卡池模拟", Description = "模拟抽卡", UsageHint = "[次数] [卡池ID] [是否压缩图片]")]
+[ApiCommand(Alias = "卡池模拟", Description = "模拟抽卡", UsageHint = "[次数] [卡池ID]")]
 public class GachaSimulate : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {
         Dictionary<string, object?> p = new() {
-            ["mainServer"] = BandoriServer.Jp
+            ["mainServer"] = BandoriServer.Cn
         };
 
         if (args.HasArgument(0)) {
@@ -17,7 +17,7 @@ public class GachaSimulate : BaseCommand {
             p["gachaId"] = args.GetInt32(1);
         }
 
-        p["compress"] = args.GetBoolean(2) ?? ctx.Settings.Compress;
+        p["compress"] = ctx.Settings.Compress;
 
         using SugaredHttpClient rest = ctx.Rest;
 

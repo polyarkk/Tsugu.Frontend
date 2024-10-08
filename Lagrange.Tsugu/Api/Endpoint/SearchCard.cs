@@ -22,25 +22,13 @@ public class SearchCard : BaseCommand {
         }
 
         var p = new Dictionary<string, object?> {
-            ["displayedServerList"] = new[] { 0, 3 },
+            ["displayedServerList"] = new[] { 3, 0 },
             ["useEasyBG"] = true
         };
 
         using SugaredHttpClient rest = ctx.Rest;
 
-        if (int.TryParse(arg, out _)) {
-            p["text"] = arg;
-        } else {
-            // listed fuzzy search
-            var fuzzySearchResult =
-                await rest.ExternalPost<Dictionary<string, object>>("/fuzzySearch",
-                    new Dictionary<string, object> {
-                        ["text"] = arg
-                    }
-                );
-
-            p["fuzzySearchResult"] = fuzzySearchResult.Data!;
-        }
+        await rest.InjectFuzzySearchResult(p, arg);
 
         RestResponse response = (await rest.TsuguPost("/searchCard", p))[0];
 
