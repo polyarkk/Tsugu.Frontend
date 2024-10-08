@@ -11,7 +11,7 @@ if (!File.Exists("appsettings.json")) {
 
 #pragma warning disable CA1869
     JsonSerializerOptions options = new() {
-        WriteIndented = true
+        WriteIndented = true,
     };
 #pragma warning restore CA1869
     

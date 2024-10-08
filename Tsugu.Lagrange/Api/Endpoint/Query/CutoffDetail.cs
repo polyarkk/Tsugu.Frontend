@@ -5,7 +5,7 @@ using Tsugu.Lagrange.Command;
 namespace Tsugu.Lagrange.Api.Endpoint.Query;
 
 [ApiCommand(
-    Aliases = ["ycx", "预测线"],
+    Aliases = ["预测线", "ycx"],
     Description = "查询指定档位预测线",
     UsageHint = "<档位> [活动ID] [cn|jp|tw|kr|en]"
 )]
@@ -35,6 +35,10 @@ public class CutoffDetail : BaseCommand {
 
         if (response.IsImageBase64()) {
             await ctx.SendImage(response.String!);
+        } else {
+            await ctx.SendPlainText(
+                (string.IsNullOrWhiteSpace(response.String) ? "错误：请求失败" : response.String) + "！"
+            );
         }
     }
 }

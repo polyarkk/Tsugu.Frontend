@@ -20,6 +20,10 @@ public class ParsedCommand {
 
     public string? GetString(int index) { return !HasArgument(index) ? null : _args[index]; }
 
+    public bool Contains(string str) {
+        return _args.Contains(str);
+    }
+
     // todo: 不为null时若parse失败则报错，聊天返回参数错误
 
     public int? GetInt32(int index) {
