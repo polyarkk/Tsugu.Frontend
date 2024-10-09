@@ -48,7 +48,7 @@ public class UserEndpoint(TsuguHttpClient client) {
             o["sharedRoomNumber"] = sharedRoomNumber;
         }
 
-        await client.StationSend<TsuguUser>(
+        await client.StationSend(
             HttpMethod.Post, "/user/changeUserData",
             new { UserId = userId, Update = o, Platform = platform }
         );
@@ -84,7 +84,7 @@ public class UserEndpoint(TsuguHttpClient client) {
     public async Task BindPlayerVerification(
         string userId, Server server, uint playerId, bool unbind = false, string platform = Platform
     ) {
-        await client.StationSend<object>(
+        await client.StationSend(
             HttpMethod.Post, "/user/bindPlayerVerification",
             new {
                 UserId = userId,

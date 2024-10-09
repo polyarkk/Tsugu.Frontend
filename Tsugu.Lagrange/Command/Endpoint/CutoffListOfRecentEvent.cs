@@ -3,7 +3,7 @@
 [ApiCommand(
     Aliases = ["历史预测线", "lsycx"],
     Description = "查询与指定活动相关的指定档位的历史预测线",
-    UsageHint = "<档位> [活动ID] [cn|jp|tw|kr|en]"
+    UsageHint = "<档位> [活动ID]"
 )]
 public class CutoffListOfRecentEvent : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {

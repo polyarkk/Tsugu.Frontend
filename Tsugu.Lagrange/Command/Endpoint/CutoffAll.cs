@@ -3,7 +3,7 @@
 [ApiCommand(
     Aliases = ["预测线总览", "ycxall"],
     Description = "查询全档位预测线",
-    UsageHint = "[活动ID] [cn|jp|tw|kr|en]"
+    UsageHint = "[活动ID]"
 )]
 public class CutoffAll : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {

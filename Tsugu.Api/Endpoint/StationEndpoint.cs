@@ -42,7 +42,7 @@ public class StationEndpoint(TsuguHttpClient client) {
             o["bandoriStationToken"] = bandoriStationToken;
         }
 
-        await client.StationSend<object>(HttpMethod.Post, "/station/submitRoomNumber", o);
+        await client.StationSend(HttpMethod.Post, "/station/submitRoomNumber", o);
     }
 
     /// <summary>

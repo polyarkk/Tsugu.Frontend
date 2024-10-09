@@ -2,8 +2,7 @@
 
 [ApiCommand(
     Aliases = ["查询分数表", "查分数表", "查询分数榜", "查分数榜"],
-    Description = "查询歌曲分数排行表",
-    UsageHint = "[cn|jp|tw|kr|en]"
+    Description = "查询歌曲分数排行表"
 )]
 public class SongMeta : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {

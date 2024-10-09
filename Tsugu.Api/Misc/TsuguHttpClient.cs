@@ -58,6 +58,19 @@ public class TsuguHttpClient : HttpClient {
         return stationRestResponse.Data.DeserializeJson<T>()!;
     }
 
+    /// <inheritdoc cref="StationSend{T}"/>
+    public async Task StationSend(
+        HttpMethod method, string endpoint, object? @params = null
+    ) {
+        string content = await BaseHttpCall(method, endpoint, @params ?? new { });
+
+        StationRestResponse stationRestResponse = content.DeserializeJson<StationRestResponse>()!;
+
+        if (!stationRestResponse.IsSuccess) {
+            throw new EndpointCallException(stationRestResponse.Data.GetString());
+        }
+    }
+
     private async Task<string> BaseHttpCall(HttpMethod method, string endpoint, object? @params) {
         string json = @params.SerializeJson();
 

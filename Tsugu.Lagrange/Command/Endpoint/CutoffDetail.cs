@@ -3,7 +3,7 @@
 [ApiCommand(
     Aliases = ["预测线", "ycx"],
     Description = "查询指定档位预测线",
-    UsageHint = "<档位> [活动ID] [cn|jp|tw|kr|en]"
+    UsageHint = "<档位> [活动ID]"
 )]
 public class CutoffDetail : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {

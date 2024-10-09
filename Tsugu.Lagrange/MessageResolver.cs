@@ -37,9 +37,9 @@ public class MessageResolver {
         var typesWithApiCommand =
             from a in AppDomain.CurrentDomain.GetAssemblies()
             from t in a.GetTypes()
-            let attributes = t.GetCustomAttributes(typeof(ApiCommand), true)
+            let attributes = t.GetCustomAttributes(typeof(ApiCommandAttribute), true)
             where attributes is { Length: > 0 }
-            select new { Attribute = attributes.Cast<ApiCommand>().First()!, Type = t };
+            select new { Attribute = attributes.Cast<ApiCommandAttribute>().First()!, Type = t };
 
         foreach (var t in typesWithApiCommand) {
             if (t.Type.BaseType != typeof(BaseCommand)) {
@@ -61,12 +61,12 @@ public class MessageResolver {
 
         HashSet<Type> hashSet = [];
 
-        stringBuilder.AppendLine("当前默认服务器：CN\n可用指令：");
+        stringBuilder.AppendLine("可用指令：");
 
-        foreach (ApiCommand attr in
+        foreach (ApiCommandAttribute attr in
             from apiType in _apis.Values
             where hashSet.Add(apiType)
-            select apiType.GetCustomAttribute<ApiCommand>()!
+            select apiType.GetCustomAttribute<ApiCommandAttribute>()!
         ) {
             stringBuilder.AppendLine($"{string.Join("|", attr.Aliases)} {attr.UsageHint}");
         }
@@ -133,7 +133,7 @@ public class MessageResolver {
 #endif
 
         if (string.Equals(tokens[0], "tsugu_help", StringComparison.OrdinalIgnoreCase)) {
-            await context.SendPlainText(GetHelpPlainText());
+            await context.SendPlainText($"当前主服务器: {context.TsuguUser.MainServer.ToString().ToLower()}\n{GetHelpPlainText()}");
 
             return;
         }
@@ -157,7 +157,7 @@ public class MessageResolver {
         BaseCommand api = (BaseCommand)ctor.Invoke(null);
 
         if (tokens.Contains("--help")) {
-            ApiCommand attr = api.GetAttribute();
+            ApiCommandAttribute attr = api.GetAttribute();
 
             await context.SendPlainText($"""
                                          {string.Join("|", attr.Aliases)} {attr.UsageHint}
