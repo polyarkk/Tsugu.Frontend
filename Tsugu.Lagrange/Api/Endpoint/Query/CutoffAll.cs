@@ -12,7 +12,7 @@ namespace Tsugu.Lagrange.Api.Endpoint.Query;
 public class CutoffAll : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {
         Dictionary<string, object?> p = new() {
-            ["mainServer"] = args.GetEnum<BandoriServer>(1) ?? BandoriServer.Cn
+            ["mainServer"] = args.GetEnum<BandoriServer>(1) ?? BandoriServer.Cn,
         };
 
         if (args.HasArgument(0)) {

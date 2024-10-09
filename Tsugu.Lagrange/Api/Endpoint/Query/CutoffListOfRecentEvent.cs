@@ -18,7 +18,7 @@ public class CutoffListOfRecentEvent : BaseCommand {
         }
 
         Dictionary<string, object?> p = new() {
-            ["tier"] = args.GetInt32(0)
+            ["tier"] = args.GetInt32(0),
         };
 
         if (args.HasArgument(1)) {

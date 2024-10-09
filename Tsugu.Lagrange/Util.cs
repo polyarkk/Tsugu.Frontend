@@ -7,7 +7,7 @@ namespace Tsugu.Lagrange;
 
 internal static class Util {
     public readonly static JsonSerializerOptions JsonConfig = new() {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
     public static T? DeserializeJson<T>(this string json) { return JsonSerializer.Deserialize<T>(json, JsonConfig); }

@@ -13,7 +13,7 @@ public class SongMeta : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {
         Dictionary<string, object?> p = new() {
             ["displayedServerList"] = new[] { 3, 0 },
-            ["mainServer"] = args.GetEnum<BandoriServer>(0) ?? BandoriServer.Cn
+            ["mainServer"] = args.GetEnum<BandoriServer>(0) ?? BandoriServer.Cn,
         };
 
         using SugaredHttpClient rest = ctx.Rest;

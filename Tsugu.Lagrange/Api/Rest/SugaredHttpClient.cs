@@ -89,7 +89,7 @@ public class SugaredHttpClient : IDisposable {
             ExternalRestResponse<Dictionary<string, object>> fuzzySearchResult =
                 await ExternalPost<Dictionary<string, object>>("/fuzzySearch",
                     new Dictionary<string, object> {
-                        ["text"] = arg
+                        ["text"] = arg,
                     }
                 );
 

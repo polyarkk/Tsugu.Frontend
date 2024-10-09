@@ -9,7 +9,7 @@ public enum ChartDifficulty {
 
     Expert,
 
-    Special
+    Special,
 }
 
 public static class ChartDifficultyExtension {
@@ -24,7 +24,7 @@ public static class ChartDifficultyExtension {
             "hd" => ChartDifficulty.Hard,
             "ex" => ChartDifficulty.Expert,
             "sp" => ChartDifficulty.Special,
-            _ => null
+            _ => null,
         };
     }
 }

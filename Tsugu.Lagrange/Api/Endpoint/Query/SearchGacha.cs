@@ -20,7 +20,7 @@ public class SearchGacha : BaseCommand {
             ["displayedServerList"] = new[] { 3, 0 },
             ["gachaId"] = args.GetInt32(0),
             ["useEasyBG"] = true,
-            ["compress"] = ctx.Settings.Compress
+            ["compress"] = ctx.Settings.Compress,
         };
 
         using SugaredHttpClient rest = ctx.Rest;

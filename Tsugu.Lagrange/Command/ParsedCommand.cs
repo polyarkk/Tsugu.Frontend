@@ -1,15 +1,15 @@
 ﻿namespace Tsugu.Lagrange.Command;
 
 public class ParsedCommand {
-    public string[] Args;
+    private readonly string[] _args;
 
-    public string ConcatenatedArgs => string.Join(" ", Args);
+    public string ConcatenatedArgs => string.Join(" ", _args);
 
     public string Alias { get; set; }
 
-    public string? this[int index] => HasArgument(index) ? Args[index] : null;
+    public string? this[int index] => HasArgument(index) ? _args[index] : null;
 
-    public string[] this[Range range] => Args[range];
+    public string[] this[Range range] => _args[range];
 
     public ParsedCommand(string[] args) {
         if (args.Length < 1) {
@@ -17,16 +17,14 @@ public class ParsedCommand {
         }
 
         Alias = args[0];
-        Args = args.Skip(1).ToArray();
+        _args = args.Skip(1).ToArray();
     }
 
-    public bool HasArgument(int index) { return index >= 0 && index < Args.Length; }
+    public bool HasArgument(int index) { return index >= 0 && index < _args.Length; }
 
-    public string? GetString(int index) { return !HasArgument(index) ? null : Args[index]; }
+    public string? GetString(int index) { return !HasArgument(index) ? null : _args[index]; }
 
-    public int Length => Args.Length;
-
-    // todo: 不为null时若parse失败则报错，聊天返回参数错误
+    public int Length => _args.Length;
 
     public int? GetInt32(int index) {
         string? v = GetString(index);

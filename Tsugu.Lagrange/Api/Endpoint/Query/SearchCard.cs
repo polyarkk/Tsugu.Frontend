@@ -26,7 +26,7 @@ public class SearchCard : BaseCommand {
         Dictionary<string, object?> p = new() {
             ["displayedServerList"] = new[] { 3, 0 },
             ["useEasyBG"] = true,
-            ["compress"] = ctx.Settings.Compress
+            ["compress"] = ctx.Settings.Compress,
         };
 
         using SugaredHttpClient rest = ctx.Rest;

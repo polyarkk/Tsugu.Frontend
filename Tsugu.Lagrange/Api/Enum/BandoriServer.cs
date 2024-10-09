@@ -9,5 +9,5 @@ public enum BandoriServer {
 
     Cn,
 
-    Kr
+    Kr,
 }

@@ -21,7 +21,7 @@ public class SearchPlayer : BaseCommand {
             ["playerId"] = args.GetInt32(0),
             ["mainServer"] = args.GetEnum<BandoriServer>(1) ?? BandoriServer.Cn,
             ["useEasyBG"] = true,
-            ["compress"] = ctx.Settings.Compress
+            ["compress"] = ctx.Settings.Compress,
         };
 
         using SugaredHttpClient rest = ctx.Rest;

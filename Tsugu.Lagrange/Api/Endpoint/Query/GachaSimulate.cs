@@ -8,7 +8,7 @@ namespace Tsugu.Lagrange.Api.Endpoint.Query;
 public class GachaSimulate : BaseCommand {
     public async override Task Invoke(Context ctx, ParsedCommand args) {
         Dictionary<string, object?> p = new() {
-            ["mainServer"] = BandoriServer.Cn
+            ["mainServer"] = BandoriServer.Cn,
         };
 
         if (args.HasArgument(0)) {
