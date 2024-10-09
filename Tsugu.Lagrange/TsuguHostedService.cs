@@ -20,6 +20,8 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
 
     private readonly MessageResolver _messageResolver;
 
+    private readonly Timer _gcTimer;
+
     private BotKeystore _keyStore;
 
     private bool _needQrCodeLogin;
@@ -31,6 +33,7 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
         _logger = logger;
         _logger.LogInformation("--- TSUGU FRONTEND IS NOW STARTING!!! ---");
         _messageResolver = messageResolver;
+        _gcTimer = new Timer(_ => GC.Collect(), null, TimeSpan.FromMinutes(30), TimeSpan.FromMinutes(30));
 
         BotDeviceInfo deviceInfo;
 
@@ -61,19 +64,33 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
         _botContext = BotFactory.Create(new BotConfig(), deviceInfo, _keyStore);
     }
 
-    public void Dispose() { _botContext.Dispose(); }
+    public void Dispose() {
+        _botContext.Dispose();
+    }
 
-    public async Task StartAsync(CancellationToken cancellationToken) { await Login(); }
+    public async Task StartAsync(CancellationToken cancellationToken) {
+        await Login();
+    }
 
-    public Task StopAsync(CancellationToken cancellationToken) { return Task.CompletedTask; }
+    public async Task StopAsync(CancellationToken cancellationToken) {
+        await _gcTimer.DisposeAsync();
+    }
 
-    public Task StartingAsync(CancellationToken cancellationToken) { return Task.CompletedTask; }
+    public Task StartingAsync(CancellationToken cancellationToken) {
+        return Task.CompletedTask;
+    }
 
-    public Task StartedAsync(CancellationToken cancellationToken) { return Task.CompletedTask; }
+    public Task StartedAsync(CancellationToken cancellationToken) {
+        return Task.CompletedTask;
+    }
 
-    public Task StoppingAsync(CancellationToken cancellationToken) { return Task.CompletedTask; }
+    public Task StoppingAsync(CancellationToken cancellationToken) {
+        return Task.CompletedTask;
+    }
 
-    public Task StoppedAsync(CancellationToken cancellationToken) { return Task.CompletedTask; }
+    public Task StoppedAsync(CancellationToken cancellationToken) {
+        return Task.CompletedTask;
+    }
 
     private BotDeviceInfo GenerateDeviceInfo() {
         _logger.LogInformation("generating new device info file...");
@@ -164,7 +181,7 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
         }
 
         StringBuilder sb = new();
-        
+
         if (chain.GroupUin != null) {
             sb.AppendLine($"group          : {chain.GroupUin}");
             sb.AppendLine($"user           : {chain.GroupMemberInfo?.MemberName}({chain.GroupMemberInfo?.Uin})");
