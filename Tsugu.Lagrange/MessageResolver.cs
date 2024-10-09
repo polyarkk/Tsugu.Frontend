@@ -9,12 +9,14 @@ using Microsoft.Extensions.Logging;
 using System.Reflection;
 using System.Text;
 using Tsugu.Api.Misc;
+using Tsugu.Lagrange.Command.Endpoint;
+using Tsugu.Lagrange.Util;
 using BindingFlags = System.Reflection.BindingFlags;
 
 namespace Tsugu.Lagrange;
 
 public class MessageResolver {
-    private readonly Dictionary<string, Type> _apis;
+    private readonly Dictionary<string, Type> _commands;
 
     private readonly ILogger<MessageResolver> _logger;
 
@@ -25,14 +27,14 @@ public class MessageResolver {
         IConfiguration configuration
     ) {
         _logger = logger;
-        _apis = new Dictionary<string, Type>();
+        _commands = new Dictionary<string, Type>();
         _appSettings = configuration.GetSection("Tsugu").Get<AppSettings>()!;
 
         LoadEndpoints();
     }
 
     private void LoadEndpoints() {
-        _apis.Clear();
+        _commands.Clear();
 
         var typesWithApiCommand =
             from a in AppDomain.CurrentDomain.GetAssemblies()
@@ -51,7 +53,7 @@ public class MessageResolver {
             }
 
             foreach (string alias in t.Attribute.Aliases) {
-                _apis[alias] = t.Type;
+                _commands[alias] = t.Type;
             }
         }
     }
@@ -64,11 +66,11 @@ public class MessageResolver {
         stringBuilder.AppendLine("可用指令：");
 
         foreach (ApiCommandAttribute attr in
-            from apiType in _apis.Values
+            from apiType in _commands.Values
             where hashSet.Add(apiType)
             select apiType.GetCustomAttribute<ApiCommandAttribute>()!
         ) {
-            stringBuilder.AppendLine($"{string.Join("|", attr.Aliases)} {attr.UsageHint}");
+            stringBuilder.AppendLine($" - {string.Join("|", attr.Aliases)}: {attr.Description}");
         }
 
         stringBuilder.AppendLine("* 指令尾随 --help 将输出指令的详细帮助");
@@ -133,22 +135,25 @@ public class MessageResolver {
 #endif
 
         if (string.Equals(tokens[0], "tsugu_help", StringComparison.OrdinalIgnoreCase)) {
-            await context.SendPlainText($"当前主服务器: {context.TsuguUser.MainServer.ToString().ToLower()}\n{GetHelpPlainText()}");
+            await context.SendPlainText(
+                $"当前主服务器: {context.TsuguUser.MainServer.ToString().ToLower()}\n{GetHelpPlainText()}"
+            );
 
             return;
         }
 
-        if (!_apis.TryGetValue(tokens[0], out Type? apiType)) {
+        if (!_commands.TryGetValue(tokens[0], out Type? commandType)) {
             return;
         }
 
-        ConstructorInfo? ctor =
-            apiType.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, []);
+        ConstructorInfo? ctor = commandType.GetConstructor(
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, []
+        );
 
         if (ctor == null) {
             _logger.LogWarning(
-                "constructor of command [{cmd}] not found! make sure the no-params constructor is defined and public.",
-                apiType.Name
+                "command constructor {a}::{a}() not found!",
+                commandType.Name, commandType.Name
             );
 
             return;
@@ -157,19 +162,13 @@ public class MessageResolver {
         BaseCommand api = (BaseCommand)ctor.Invoke(null);
 
         if (tokens.Contains("--help")) {
-            ApiCommandAttribute attr = api.GetAttribute();
-
-            await context.SendPlainText($"""
-                                         {string.Join("|", attr.Aliases)} {attr.UsageHint}
-                                         {attr.Description}
-                                         """
-            );
+            await context.SendPlainText(api.GetHelpText());
 
             return;
         }
 
         try {
-            await api.Invoke(context, new ParsedCommand(tokens));
+            await api.InvokePre(context, new ParsedCommand(tokens));
         } catch (CommandParseException e) {
             await context.SendPlainText(api.GetErrorAndHelpText(e.Message));
         } catch (EndpointCallException e) {

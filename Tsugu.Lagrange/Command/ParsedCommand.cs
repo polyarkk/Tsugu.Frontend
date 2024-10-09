@@ -5,18 +5,13 @@ public class ParsedCommand {
 
     public string ConcatenatedArgs => string.Join(" ", _args);
 
-    public string Alias { get; set; }
-
     public string? this[int index] => HasArgument(index) ? _args[index] : null;
-
-    public string[] this[Range range] => _args[range];
 
     public ParsedCommand(string[] args) {
         if (args.Length < 1) {
             throw new Exception("empty command");
         }
 
-        Alias = args[0];
         _args = args.Skip(1).ToArray();
     }
 
@@ -27,8 +22,6 @@ public class ParsedCommand {
     public string? GetString(int index) {
         return !HasArgument(index) ? null : _args[index];
     }
-
-    public int Length => _args.Length;
 
     public uint? GetUInt32(int index) {
         string? v = GetString(index);
@@ -66,12 +59,7 @@ public class ParsedCommand {
         }
 
         if (!Enum.TryParse(v, true, out TEnum e)) {
-            string candidates = string.Join("|",
-                Enum.GetValues(typeof(TEnum))
-                    .Cast<TEnum>()
-                    .Select(@enum => @enum.ToString().ToLower())
-                    .ToArray()
-            );
+            string candidates = string.Join("|", Enum.GetNames(typeof(TEnum)).Select(n => n.ToLower()));
             
             throw new CommandParseException(
                 $"参数{index + 1}类型错误，需要枚举{typeof(TEnum).Name}！（{candidates}）"

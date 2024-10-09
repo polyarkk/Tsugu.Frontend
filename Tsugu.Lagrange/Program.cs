@@ -1,4 +1,6 @@
-﻿using Tsugu.Lagrange;
+﻿global using ArgumentMeta = (string, System.Type, bool);
+
+using Tsugu.Lagrange;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

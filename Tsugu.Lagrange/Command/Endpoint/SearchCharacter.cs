@@ -1,28 +1,24 @@
-﻿namespace Tsugu.Lagrange.Command.Endpoint;
+﻿using Tsugu.Lagrange.Util;
+
+namespace Tsugu.Lagrange.Command.Endpoint;
 
 [ApiCommand(
     Aliases = ["查角色"],
-    Description = """
-                  根据角色名、乐队、昵称等查询角色信息
-                  使用示例:
-                  查角色 10：返回10号角色的信息
-                  查角色 吉他：返回所有角色模糊搜索标签中包含吉他的角色列表
-                  """,
-    UsageHint = "<关键词>"
+    Description = "根据角色名、乐队、昵称等查询角色信息",
+    Example = """
+              查角色 10：返回10号角色的信息
+              查角色 吉他：返回所有角色模糊搜索标签中包含吉他的角色列表
+              """
 )]
 public class SearchCharacter : BaseCommand {
-    public async override Task Invoke(Context ctx, ParsedCommand args) {
-        string arg = args.ConcatenatedArgs;
+    protected override ArgumentMeta[] Arguments { get; } = [
+        Argument<string>("关键词"),
+    ];
 
-        if (string.IsNullOrWhiteSpace(arg)) {
-            await ctx.SendPlainText(GetErrorAndHelpText("未指定查询关键词！"));
-
-            return;
-        }
-
+    protected async override Task Invoke(Context ctx, ParsedCommand args) {
         string base64 = await ctx.Tsugu.Query.SearchCharacter(
             ctx.TsuguUser.DisplayedServerList,
-            arg,
+            args.ConcatenatedArgs,
             ctx.AppSettings.Compress
         );
 

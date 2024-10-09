@@ -1,18 +1,17 @@
-﻿namespace Tsugu.Lagrange.Command.Endpoint;
+﻿using Tsugu.Lagrange.Util;
+
+namespace Tsugu.Lagrange.Command.Endpoint;
 
 [ApiCommand(
     Aliases = ["查卡池"],
-    Description = "查询指定卡池的信息",
-    UsageHint = "<卡池ID>"
+    Description = "查询指定卡池的信息"
 )]
 public class SearchGacha : BaseCommand {
-    public async override Task Invoke(Context ctx, ParsedCommand args) {
-        if (!args.HasArgument(0)) {
-            await ctx.SendPlainText(GetErrorAndHelpText("未指定卡池ID！"));
+    protected override ArgumentMeta[] Arguments { get; } = [
+        Argument<uint>("卡池ID"),
+    ];
 
-            return;
-        }
-
+    protected async override Task Invoke(Context ctx, ParsedCommand args) {
         string base64 = await ctx.Tsugu.Query.SearchGacha(
             ctx.TsuguUser.DisplayedServerList,
             (uint)args.GetUInt32(0)!,

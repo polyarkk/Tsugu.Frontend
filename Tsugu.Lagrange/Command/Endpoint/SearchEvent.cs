@@ -1,28 +1,24 @@
-﻿namespace Tsugu.Lagrange.Command.Endpoint;
+﻿using Tsugu.Lagrange.Util;
+
+namespace Tsugu.Lagrange.Command.Endpoint;
 
 [ApiCommand(
     Aliases = ["查活动"],
-    Description = """
-                  查询指定活动的信息，或查询符合条件的活动列表。
-                  使用示例:
-                  查活动 253：返回253期活动的信息
-                  查活动 ag 蓝：返回Afterglow乐队、Cool属性的活动列表
-                  """,
-    UsageHint = "<关键词>"
+    Description = "查询指定活动的信息，或查询符合条件的活动列表。",
+    Example = """
+              查活动 253：返回253期活动的信息
+              查活动 ag 蓝：返回Afterglow乐队、Cool属性的活动列表
+              """
 )]
 public class SearchEvent : BaseCommand {
-    public async override Task Invoke(Context ctx, ParsedCommand args) {
-        string arg = args.ConcatenatedArgs;
+    protected override ArgumentMeta[] Arguments { get; } = [
+        Argument<string>("关键词"),
+    ];
 
-        if (string.IsNullOrWhiteSpace(arg)) {
-            await ctx.SendPlainText(GetErrorAndHelpText("未指定查询关键词！"));
-
-            return;
-        }
-        
+    protected async override Task Invoke(Context ctx, ParsedCommand args) {
         string base64 = await ctx.Tsugu.Query.SearchEvent(
             ctx.TsuguUser.DisplayedServerList,
-            arg,
+            args.ConcatenatedArgs,
             false,
             ctx.AppSettings.Compress
         );

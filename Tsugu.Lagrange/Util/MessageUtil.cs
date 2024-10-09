@@ -1,21 +1,10 @@
 ﻿using Lagrange.Core.Common.Interface.Api;
 using Lagrange.Core.Event.EventArg;
 using Lagrange.Core.Message;
-using System.Text.Json;
 
-namespace Tsugu.Lagrange;
+namespace Tsugu.Lagrange.Util;
 
-internal static class Util {
-    public readonly static JsonSerializerOptions JsonConfig = new() {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-    };
-
-    public static T? DeserializeJson<T>(this string json) { return JsonSerializer.Deserialize<T>(json, JsonConfig); }
-    
-    public static T? DeserializeJson<T>(this JsonElement json) { return json.Deserialize<T>(JsonConfig); }
-
-    public static string SerializeJson<T>(this T obj) { return JsonSerializer.Serialize(obj, JsonConfig); }
-    
+internal static class MessageUtil {
     public static MessageBuilder GetDefaultMessageBuilder(Context ctx) {
         return ctx.Event is GroupMessageEvent
             ? MessageBuilder.Group((uint)ctx.Chain.GroupUin!).Mention(ctx.Chain.FriendUin)

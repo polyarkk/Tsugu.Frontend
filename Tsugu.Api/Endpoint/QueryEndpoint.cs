@@ -114,7 +114,7 @@ public class QueryEndpoint(TsuguHttpClient client) {
         Server[] displayedServerList, string text, bool useEasyBg = false, bool compress = true
     ) {
         Dictionary<string, object> o = new() {
-            ["displayServerList"] = displayedServerList,
+            ["displayedServerList"] = displayedServerList,
             ["useEasyBG"] = useEasyBg,
             ["compress"] = compress,
         };
@@ -142,7 +142,7 @@ public class QueryEndpoint(TsuguHttpClient client) {
     /// <exception cref="EndpointCallException">查询文本为空时将抛出异常</exception>
     public async Task<string> SearchCharacter(Server[] displayedServerList, string text, bool compress = true) {
         Dictionary<string, object> o = new() {
-            ["displayServerList"] = displayedServerList,
+            ["displayedServerList"] = displayedServerList,
             ["compress"] = compress,
         };
 
@@ -172,7 +172,7 @@ public class QueryEndpoint(TsuguHttpClient client) {
         Server[] displayedServerList, string text, bool useEasyBg = false, bool compress = true
     ) {
         Dictionary<string, object> o = new() {
-            ["displayServerList"] = displayedServerList,
+            ["displayedServerList"] = displayedServerList,
             ["useEasyBG"] = useEasyBg,
             ["compress"] = compress,
         };
@@ -242,7 +242,7 @@ public class QueryEndpoint(TsuguHttpClient client) {
     /// <exception cref="EndpointCallException">查询文本为空时将抛出异常</exception>
     public async Task<string> SearchSong(Server[] displayedServerList, string text, bool compress = true) {
         Dictionary<string, object> o = new() {
-            ["displayServerList"] = displayedServerList,
+            ["displayedServerList"] = displayedServerList,
             ["compress"] = compress,
         };
 

@@ -1,21 +1,19 @@
 ﻿using Tsugu.Api.Enum;
+using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
 
 [ApiCommand(
     Aliases = ["主服务器", "设置主服务器"],
-    Description = "将指定的服务器设置为你的主服务器",
-    UsageHint = "<cn|jp|tw|en|kr>"
+    Description = "将指定的服务器设置为你的主服务器"
 )]
 public class MainServer : BaseCommand {
-    public async override Task Invoke(Context ctx, ParsedCommand args) {
-        Server? mainServer = args.GetEnum<Server>(0);
+    protected override ArgumentMeta[] Arguments { get; } = [
+        Argument<Server>("主服务器"),
+    ];
 
-        if (mainServer == null) {
-            await ctx.SendPlainText(GetErrorAndHelpText("未指定主服务器"));
-
-            return;
-        }
+    protected async override Task Invoke(Context ctx, ParsedCommand args) {
+        Server mainServer = (Server)args.GetEnum<Server>(0)!;
 
         await ctx.Tsugu.User.ChangeUserData(
             ctx.TsuguUser.UserId,

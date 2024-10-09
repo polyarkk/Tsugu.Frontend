@@ -1,28 +1,24 @@
-﻿namespace Tsugu.Lagrange.Command.Endpoint;
+﻿using Tsugu.Lagrange.Util;
+
+namespace Tsugu.Lagrange.Command.Endpoint;
 
 [ApiCommand(
     Aliases = ["查曲"],
-    Description = """
-                  根据关键词或曲目ID查询曲目信息
-                  使用示例:
-                  查曲 1：返回1号曲的信息
-                  查曲 ag lv27：返回所有难度为27的ag曲列表
-                  """,
-    UsageHint = "<关键词>"
+    Description = "根据关键词或曲目ID查询曲目信息",
+    Example = """
+              查曲 1：返回1号曲的信息
+              查曲 ag lv27：返回所有难度为27的ag曲列表
+              """
 )]
 public class SearchSong : BaseCommand {
-    public async override Task Invoke(Context ctx, ParsedCommand args) {
-        string arg = args.ConcatenatedArgs;
+    protected override ArgumentMeta[] Arguments { get; } = [
+        Argument<string>("关键词"),
+    ];
 
-        if (string.IsNullOrWhiteSpace(arg)) {
-            await ctx.SendPlainText(GetErrorAndHelpText("未指定查询关键词！"));
-
-            return;
-        }
-
+    protected async override Task Invoke(Context ctx, ParsedCommand args) {
         string base64 = await ctx.Tsugu.Query.SearchSong(
             ctx.TsuguUser.DisplayedServerList,
-            arg,
+            args.ConcatenatedArgs,
             ctx.AppSettings.Compress
         );
 
