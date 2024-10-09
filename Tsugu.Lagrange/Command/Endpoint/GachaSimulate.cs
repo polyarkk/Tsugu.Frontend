@@ -8,15 +8,15 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class GachaSimulate : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        OptionalArgument<uint>("次数"),
-        OptionalArgument<uint>("卡池ID"),
+        OptionalArgument<uint>("times", "次数"),
+        OptionalArgument<uint>("gachaId", "卡池ID"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedCommand args) {
+    protected async override Task Invoke(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.GachaSimulate(
             ctx.TsuguUser.MainServer,
-            args.GetUInt32(1),
-            args.GetUInt32(0) ?? 10,
+            args["gachaId"].GetOrNull<uint>(),
+            args["times"].GetOr(() => 10u),
             ctx.AppSettings.Compress
         );
 

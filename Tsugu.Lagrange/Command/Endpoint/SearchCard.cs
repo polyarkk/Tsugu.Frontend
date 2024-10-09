@@ -12,10 +12,10 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class SearchCard : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        Argument<string>("关键词"),
+        Argument<string>("keywords", "关键词"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedCommand args) {
+    protected async override Task Invoke(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SearchCard(
             ctx.TsuguUser.DisplayedServerList,
             args.ConcatenatedArgs,

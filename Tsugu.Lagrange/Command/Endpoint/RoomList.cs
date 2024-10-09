@@ -8,7 +8,7 @@ namespace Tsugu.Lagrange.Command.Endpoint;
     Description = "获取车站信息"
 )]
 public class RoomList : BaseCommand {
-    protected async override Task Invoke(Context ctx, ParsedCommand args) {
+    protected async override Task Invoke(Context ctx, ParsedArgs args) {
         Room[] rooms = await ctx.Tsugu.Station.QueryAllRoom();
 
         string base64 = await ctx.Tsugu.Query.RoomList(rooms);

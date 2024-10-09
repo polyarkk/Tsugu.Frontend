@@ -1,46 +1,18 @@
 ﻿using System.Reflection;
 using System.Text;
-using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command;
 
 public abstract class BaseCommand {
-    protected abstract Task Invoke(Context ctx, ParsedCommand args);
+    protected abstract Task Invoke(Context ctx, ParsedArgs args);
 
     /// <summary>
     /// 参数，注意可选参数一定要在必需参数之后，否则会出现异常
     /// </summary>
     protected virtual ArgumentMeta[] Arguments { get; } = [];
     
-    public async Task InvokePre(Context ctx, ParsedCommand args) {
-        // validate fields
-        for (int i = 0; i < Arguments.Length; i++) {
-            (string name, Type? type, bool optional) = Arguments[i];
-
-            string? arg = args[i];
-
-            if (!optional && arg == null) {
-                await ctx.SendPlainText(GetErrorAndHelpText($"未提供关键参数 [{name}]！"));
-
-                return;
-            }
-
-            try {
-                _ = ConvertUtil.To(type, arg);
-            } catch (Exception) {
-                if (type.IsEnum) {
-                    string candidates = string.Join("|", Enum.GetNames(type).Select(n => n.ToLower()));
-
-                    await ctx.SendPlainText(GetErrorAndHelpText($"参数 [{name}] 非法，需要 {type.Name}！({candidates})"));
-                } else {
-                    await ctx.SendPlainText(GetErrorAndHelpText($"参数 [{name}] 非法，需要 {type.Name}！"));
-                }
-
-                return;
-            }
-        }
-
-        await Invoke(ctx, args);
+    public async Task InvokePre(Context ctx, string[] tokens) {
+        await Invoke(ctx, new ParsedArgs(Arguments, tokens));
     }
 
     private ApiCommandAttribute GetAttribute() {
@@ -55,9 +27,9 @@ public abstract class BaseCommand {
     }
 
     private string GetArgumentHelpText() {
-        StringBuilder argumentBuilder = new StringBuilder();
+        StringBuilder argumentBuilder = new();
 
-        foreach ((string name, Type type, bool optional) in Arguments) {
+        foreach ((_, string name, Type type, bool optional) in Arguments) {
             char pre = optional ? '[' : '<';
             char suf = optional ? ']' : '>';
             argumentBuilder.Append($"{pre}{name}: {type.Name}{suf} ");
@@ -71,7 +43,7 @@ public abstract class BaseCommand {
     public string GetHelpText() {
         ApiCommandAttribute attr = GetAttribute();
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
 
         sb.Append(
             $"""
@@ -93,11 +65,11 @@ public abstract class BaseCommand {
         return sb.ToString();
     }
 
-    protected static ArgumentMeta Argument<T>(string name) {
-        return (name, typeof(T), false);
+    protected static ArgumentMeta Argument<T>(string key, string name) {
+        return (key, name, typeof(T), false);
     }
 
-    protected static ArgumentMeta OptionalArgument<T>(string name) {
-        return (name, typeof(T), true);
+    protected static ArgumentMeta OptionalArgument<T>(string key, string name) {
+        return (key, name, typeof(T), true);
     }
 }

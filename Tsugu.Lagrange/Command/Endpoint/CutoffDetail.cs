@@ -8,21 +8,15 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class CutoffDetail : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        Argument<uint>("档位"),
-        OptionalArgument<uint>("活动ID"),
+        Argument<uint>("tier", "档位"),
+        OptionalArgument<uint>("eventId", "活动ID"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedCommand args) {
-        if (!args.HasArgument(0)) {
-            await ctx.SendPlainText(GetErrorAndHelpText("未指定档位！"));
-
-            return;
-        }
-
+    protected async override Task Invoke(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.CutoffDetail(
             ctx.TsuguUser.MainServer,
-            (uint)args.GetUInt32(0)!,
-            args.GetUInt32(1),
+            args["tier"].Get<uint>(),
+            args["eventId"].GetOrNull<uint>(),
             ctx.AppSettings.Compress
         );
 

@@ -9,17 +9,17 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class MainServer : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        Argument<Server>("主服务器"),
+        Argument<Server>("mainServer", "主服务器"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedCommand args) {
-        Server mainServer = (Server)args.GetEnum<Server>(0)!;
+    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+        Server mainServer = args["mainServer"].Get<Server>();
 
         await ctx.Tsugu.User.ChangeUserData(
             ctx.TsuguUser.UserId,
             mainServer: mainServer
         );
 
-        await ctx.SendPlainText($"主服务器已设定为：{mainServer.ToString()!.ToLower()}");
+        await ctx.SendPlainText($"主服务器已设定为：{mainServer.ToString().ToLower()}");
     }
 }

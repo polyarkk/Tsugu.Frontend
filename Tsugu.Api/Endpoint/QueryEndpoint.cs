@@ -98,7 +98,7 @@ public class QueryEndpoint(TsuguHttpClient client) {
             throw new EndpointCallException("myc");
         }
 
-        return (await client.TsuguPost("/roomList", new { RoomList = roomList }))[0];
+        return (await client.TsuguPost("/roomList", new { RoomList = roomList, Compress = compress }))[0];
     }
 
     /// <summary>

@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using System.Reflection;
 using System.Text;
 using Tsugu.Api.Misc;
-using Tsugu.Lagrange.Command.Endpoint;
 using Tsugu.Lagrange.Util;
 using BindingFlags = System.Reflection.BindingFlags;
 
@@ -168,7 +167,7 @@ public class MessageResolver {
         }
 
         try {
-            await api.InvokePre(context, new ParsedCommand(tokens));
+            await api.InvokePre(context, tokens);
         } catch (CommandParseException e) {
             await context.SendPlainText(api.GetErrorAndHelpText(e.Message));
         } catch (EndpointCallException e) {

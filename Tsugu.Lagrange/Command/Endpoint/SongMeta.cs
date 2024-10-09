@@ -7,7 +7,7 @@ namespace Tsugu.Lagrange.Command.Endpoint;
     Description = "查询歌曲分数排行表"
 )]
 public class SongMeta : BaseCommand {
-    protected async override Task Invoke(Context ctx, ParsedCommand args) {
+    protected async override Task Invoke(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SongMeta(
             ctx.TsuguUser.DisplayedServerList,
             ctx.TsuguUser.MainServer,

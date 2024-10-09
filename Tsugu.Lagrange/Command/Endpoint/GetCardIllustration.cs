@@ -10,13 +10,13 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class GetCardIllustration : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        Argument<uint>("卡面ID"),
+        Argument<uint>("cardId", "卡面ID"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedCommand args) {
-        string[] base64List = await ctx.Tsugu.Query.GetCardIllustration((uint)args.GetUInt32(0)!);
+    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+        string[] base64List = await ctx.Tsugu.Query.GetCardIllustration(args["cardId"].Get<uint>());
 
-        MessageBuilder messageBuilder = Util.MessageUtil.GetDefaultMessageBuilder(ctx);
+        MessageBuilder messageBuilder = MessageUtil.GetDefaultMessageBuilder(ctx);
 
         foreach (string base64 in base64List) {
             messageBuilder.Image(Convert.FromBase64String(base64));

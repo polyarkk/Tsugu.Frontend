@@ -13,15 +13,15 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class SongChart : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        Argument<uint>("乐曲ID"),
-        OptionalArgument<ChartDifficulty>("难度"),
+        Argument<uint>("songId", "乐曲ID"),
+        OptionalArgument<ChartDifficulty>("difficulty", "难度"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedCommand args) {
+    protected async override Task Invoke(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SongChart(
             ctx.TsuguUser.DisplayedServerList,
-            (uint)args.GetUInt32(0)!,
-            args.GetEnum<ChartDifficulty>(1) ?? ChartDifficulty.Expert,
+            args["songId"].Get<uint>(),
+            args["difficulty"].GetOr(() => ChartDifficulty.Expert),
             ctx.AppSettings.Compress
         );
 

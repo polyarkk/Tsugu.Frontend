@@ -15,16 +15,16 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class EventStage : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        OptionalArgument<bool>("是否显示歌曲Meta"),
-        OptionalArgument<uint>("活动ID"),
-        OptionalArgument<Server>("服务器"),
+        OptionalArgument<bool>("meta", "是否显示歌曲Meta"),
+        OptionalArgument<uint>("eventId", "活动ID"),
+        OptionalArgument<Server>("mainServer", "服务器"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedCommand args) {
+    protected async override Task Invoke(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.EventStage(
-            args.GetEnum<Server>(2) ?? ctx.TsuguUser.MainServer,
-            args.GetUInt32(1),
-            args.GetBoolean(0) ?? false,
+            args["mainServer"].GetOr(() => ctx.TsuguUser.MainServer),
+            args["eventId"].GetOrNull<uint>(),
+            args["meta"].GetOr(() => false),
             ctx.AppSettings.Compress
         );
 

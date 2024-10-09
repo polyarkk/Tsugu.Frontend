@@ -12,10 +12,10 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class SongRandom : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        OptionalArgument<string>("关键词"),
+        OptionalArgument<string>("keywords", "关键词"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedCommand args) {
+    protected async override Task Invoke(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SongRandom(
             ctx.TsuguUser.MainServer,
             args.ConcatenatedArgs,

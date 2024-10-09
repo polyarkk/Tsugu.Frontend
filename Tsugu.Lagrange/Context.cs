@@ -1,7 +1,6 @@
 ﻿using Lagrange.Core;
 using Lagrange.Core.Event;
 using Lagrange.Core.Message;
-using Microsoft.Extensions.Logging;
 using Tsugu.Api;
 using Tsugu.Api.Entity;
 

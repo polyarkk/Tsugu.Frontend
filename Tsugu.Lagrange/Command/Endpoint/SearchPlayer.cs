@@ -8,12 +8,12 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class SearchPlayer : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        Argument<uint>("玩家ID"),
+        Argument<uint>("playerId", "玩家ID"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedCommand args) {
+    protected async override Task Invoke(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SearchPlayer(
-            (uint)args.GetUInt32(0)!,
+            args["playerId"].Get<uint>(),
             ctx.TsuguUser.DisplayedServerList,
             false,
             ctx.AppSettings.Compress

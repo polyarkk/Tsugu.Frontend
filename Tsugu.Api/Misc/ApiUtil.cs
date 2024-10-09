@@ -1,21 +1,9 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using Tsugu.Api.Entity;
+﻿using System.Text.Json;
 
 namespace Tsugu.Api.Misc;
 
 public static class ApiUtil {
-    public static string BaseAddress { get; set; } = "http://tsugubot.com:8080";
-
-    public static HttpClient CreateHttpClient() {
-        return new HttpClient {
-            BaseAddress = new Uri(BaseAddress),
-        };
-    }
-
-    public readonly static JsonSerializerOptions JsonConfig = new() {
+    private readonly static JsonSerializerOptions JsonConfig = new() {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 

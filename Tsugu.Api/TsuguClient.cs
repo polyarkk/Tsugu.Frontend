@@ -19,7 +19,7 @@ public class TsuguClient : IDisposable {
     /// </summary>
     public StationEndpoint Station { get; private set; }
 
-    private TsuguHttpClient _httpClient;
+    private readonly TsuguHttpClient _httpClient;
 
     public TsuguClient(string baseAddress = "http://tsugubot.com:8080") {
         TsuguHttpClient httpClient = new() {

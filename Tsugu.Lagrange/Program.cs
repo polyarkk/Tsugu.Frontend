@@ -1,4 +1,4 @@
-﻿global using ArgumentMeta = (string, System.Type, bool);
+﻿global using ArgumentMeta = (string, string, System.Type, bool);
 
 using Tsugu.Lagrange;
 using Microsoft.Extensions.Configuration;

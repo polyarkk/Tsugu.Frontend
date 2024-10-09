@@ -8,15 +8,15 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class CutoffListOfRecentEvent : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        Argument<uint>("档位"),
-        OptionalArgument<uint>("活动ID"),
+        Argument<uint>("tier", "档位"),
+        OptionalArgument<uint>("eventId", "活动ID"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedCommand args) {
+    protected async override Task Invoke(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.CutoffListOfRecentEvent(
             ctx.TsuguUser.MainServer,
-            (uint)args.GetUInt32(0)!,
-            args.GetUInt32(1),
+            args["tier"].Get<uint>(),
+            args["eventId"].Get<uint>(),
             ctx.AppSettings.Compress
         );
 

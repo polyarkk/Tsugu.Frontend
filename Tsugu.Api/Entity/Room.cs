@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Tsugu.Api.Entity;
+﻿namespace Tsugu.Api.Entity;
 
 public class Room {
     public Room(

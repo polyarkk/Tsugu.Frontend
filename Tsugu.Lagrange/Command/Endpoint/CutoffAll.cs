@@ -13,14 +13,14 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class CutoffAll : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        OptionalArgument<uint>("活动ID"),
-        OptionalArgument<Server>("服务器"),
+        OptionalArgument<uint>("eventId", "活动ID"),
+        OptionalArgument<Server>("mainServer", "服务器"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedCommand args) {
+    protected async override Task Invoke(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.CutoffAll(
-            args.GetEnum<Server>(1) ?? ctx.TsuguUser.MainServer,
-            args.GetUInt32(0),
+            args["mainServer"].GetOr(() => ctx.TsuguUser.MainServer),
+            args["eventId"].GetOrNull<uint>(),
             ctx.AppSettings.Compress
         );
 

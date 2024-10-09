@@ -106,9 +106,9 @@ public static partial class FuzzySearch {
     private static int? StringToIntOrNull(string s) {
         if (int.TryParse(s, out int i)) {
             return i;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     private readonly static Dictionary<string, Dictionary<string, string[]>> Patterns =
