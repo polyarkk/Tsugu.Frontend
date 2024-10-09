@@ -35,7 +35,15 @@ public class ParsedArgs {
     public ParsedArgs(ArgumentMeta[] metas, string[] tokens) {
         _parsedArgs = new OrderedDictionary();
 
+        if (tokens.Length <= 1) {
+            ConcatenatedArgs = "";
+            
+            return;
+        }
+
         string[] args = tokens[1..];
+
+        ConcatenatedArgs = string.Join(" ", args);
 
         int i = 0;
 
@@ -77,8 +85,6 @@ public class ParsedArgs {
                 throw new CommandParseException($"参数 [{lastName}] 非法，需要 {lastType.Name}！");
             }
         }
-
-        ConcatenatedArgs = string.Join(" ", args);
     }
 
     public class Element {
