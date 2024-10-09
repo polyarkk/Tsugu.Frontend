@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 using System.Text;
+using Tsugu.Api.Misc;
 using BindingFlags = System.Reflection.BindingFlags;
 
 namespace Tsugu.Lagrange;
@@ -15,24 +16,16 @@ namespace Tsugu.Lagrange;
 public class MessageResolver {
     private readonly Dictionary<string, Type> _apis;
 
-    private readonly IHttpClientFactory _httpClientFactory;
-
     private readonly ILogger<MessageResolver> _logger;
-
-    private readonly ILoggerFactory _loggerFactory;
 
     private readonly AppSettings _appSettings;
 
     public MessageResolver(
         ILogger<MessageResolver> logger,
-        IHttpClientFactory httpClientFactory,
-        ILoggerFactory loggerFactory,
         IConfiguration configuration
     ) {
         _logger = logger;
         _apis = new Dictionary<string, Type>();
-        _httpClientFactory = httpClientFactory;
-        _loggerFactory = loggerFactory;
         _appSettings = configuration.GetSection("Tsugu").Get<AppSettings>()!;
 
         LoadEndpoints();
@@ -119,7 +112,7 @@ public class MessageResolver {
             return;
         }
 
-        Context context = new(_appSettings, botContext, @event, messageChain, _httpClientFactory, _loggerFactory);
+        using Context context = new(_appSettings, botContext, @event, messageChain);
 
         if (string.Equals(tokens[0], "tsugu_reload_appsettings", StringComparison.OrdinalIgnoreCase)) {
             // todo
@@ -179,6 +172,8 @@ public class MessageResolver {
             await api.Invoke(context, new ParsedCommand(tokens));
         } catch (CommandParseException e) {
             await context.SendPlainText(api.GetErrorAndHelpText(e.Message));
+        } catch (EndpointCallException e) {
+            await context.SendPlainText(e.Message);
         } catch (Exception e) {
             _logger.LogError("exception raised upon resolving command!\n{e}", e.ToString());
         }

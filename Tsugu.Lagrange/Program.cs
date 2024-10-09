@@ -26,7 +26,6 @@ if (!File.Exists("appsettings.json")) {
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddHttpClient();
 builder.Services.AddHostedService<TsuguHostedService>();
 builder.Services.AddScoped<MessageResolver>();
 builder.Configuration.AddJsonFile("appsettings.json");

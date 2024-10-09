@@ -1,26 +1,43 @@
 ﻿using Lagrange.Core;
 using Lagrange.Core.Event;
 using Lagrange.Core.Message;
-using Tsugu.Lagrange.Api.Rest;
 using Microsoft.Extensions.Logging;
+using Tsugu.Api;
+using Tsugu.Api.Entity;
 
 namespace Tsugu.Lagrange;
 
-public class Context(
-    AppSettings appSettings,
-    BotContext botContext,
-    EventBase @event,
-    MessageChain messageChain,
-    IHttpClientFactory httpClientFactory,
-    ILoggerFactory loggerFactory
-) {
-    public AppSettings Settings => appSettings;
-    
-    public BotContext Bot => botContext;
+public class Context : IDisposable {
+    public Context(
+        AppSettings appAppSettings,
+        BotContext botContext,
+        EventBase @event,
+        MessageChain messageChain
+    ) {
+        AppSettings = appAppSettings;
+        Bot = botContext;
+        Event = @event;
+        Chain = messageChain;
+        Tsugu = new TsuguClient(appAppSettings.BackendUrl);
+        _tsuguUser = new Lazy<TsuguUser>(() => Tsugu.User.GetUserData(Chain.FriendUin.ToString()).Result);
+    }
 
-    public EventBase Event => @event;
+    private readonly Lazy<TsuguUser> _tsuguUser;
 
-    public MessageChain Chain => messageChain;
+    public AppSettings AppSettings { get; }
 
-    public SugaredHttpClient Rest => new(httpClientFactory, loggerFactory, appSettings);
+    public BotContext Bot { get; }
+
+    public EventBase Event { get; }
+
+    public MessageChain Chain { get; }
+
+    public TsuguClient Tsugu { get; }
+
+    public TsuguUser TsuguUser => _tsuguUser.Value;
+
+    public void Dispose() {
+        GC.SuppressFinalize(this);
+        Tsugu.Dispose();
+    }
 }

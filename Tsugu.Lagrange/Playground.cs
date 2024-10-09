@@ -1,20 +1,18 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Tsugu.Lagrange;
 
 class A {
-    public string GetType2() { return GetType().Name; }
+    public A(string b) { B = b; }
+    public string B { get; set; }
 }
-
-class B : A { }
 
 public class Playground {
     public static void Api() {
-        IConfigurationRoot conf = new ConfigurationBuilder()
-            .AddEnvironmentVariables()
-            .AddJsonFile("appsettings.json")
-            .Build();
-        
-        Console.WriteLine(conf.GetSection("Tsugu").Get<AppSettings>()!.Friends[0]);
+        Console.WriteLine("""
+                          {"b": "haha"}
+                          """.DeserializeJson<A>().B
+        );
     }
 }

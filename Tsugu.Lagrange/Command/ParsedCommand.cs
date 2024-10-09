@@ -26,14 +26,14 @@ public class ParsedCommand {
 
     public int Length => _args.Length;
 
-    public int? GetInt32(int index) {
+    public uint? GetUInt32(int index) {
         string? v = GetString(index);
 
         if (v == null) {
             return null;
         }
 
-        if (!int.TryParse(v, out int i)) {
+        if (!uint.TryParse(v, out uint i)) {
             throw new CommandParseException($"参数{index + 1}类型错误，需要整数！");
         }
 

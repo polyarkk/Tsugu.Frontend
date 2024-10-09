@@ -1,16 +1,16 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Tsugu.Lagrange.Api.Rest;
+namespace Tsugu.Api.Entity;
 
 [Serializable]
-public class RestResponse {
-    public RestResponse(string type, string @string) {
+public class ImageRestResponse {
+    public ImageRestResponse(string type, string @string) {
         Type = type;
         String = @string;
     }
 
     [JsonConstructor]
-    public RestResponse() { }
+    public ImageRestResponse() { }
 
     /// <summary>
     /// "string" | "base64"
@@ -19,7 +19,7 @@ public class RestResponse {
 
     public string? String { get; set; }
 
-    public bool IsImageBase64() { return string.Equals(Type, "base64", StringComparison.CurrentCultureIgnoreCase); }
+    public bool IsImageBase64 => string.Equals(Type, "base64", StringComparison.CurrentCultureIgnoreCase);
 
     public override string ToString() { return $"[RestResponse Type=[{Type}] String=[{String}]"; }
 }

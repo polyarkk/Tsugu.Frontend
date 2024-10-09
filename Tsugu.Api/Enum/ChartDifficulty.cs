@@ -1,4 +1,4 @@
-﻿namespace Tsugu.Lagrange.Api.Enum;
+﻿namespace Tsugu.Api.Enum;
 
 public enum ChartDifficulty {
     Easy,
