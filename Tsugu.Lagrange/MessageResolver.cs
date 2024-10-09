@@ -117,8 +117,7 @@ public class MessageResolver {
 
         if (string.Equals(tokens[0], "tsugu_reload_appsettings", StringComparison.OrdinalIgnoreCase)) {
             // todo
-
-            await context.SendPlainText("已重新加载配置信息");
+            // await context.SendPlainText("已重新加载配置信息");
 
             return;
         }

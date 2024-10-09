@@ -9,7 +9,7 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class MainServer : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        Argument<Server>("mainServer", "主服务器"),
+        Argument<Server>("mainServer", "若干主服务器"),
     ];
 
     protected async override Task Invoke(Context ctx, ParsedArgs args) {

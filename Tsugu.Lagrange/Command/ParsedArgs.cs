@@ -1,4 +1,5 @@
-﻿using Tsugu.Lagrange.Util;
+﻿using System.Collections.Specialized;
+using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command;
 
@@ -8,18 +9,38 @@ public class ParsedArgs {
     /// </summary>
     public string ConcatenatedArgs { get; }
 
-    private readonly Dictionary<string, dynamic?> _parsedArgs;
+    private readonly OrderedDictionary _parsedArgs;
 
-    public Element this[string key]
-        => _parsedArgs.TryGetValue(key, out dynamic? value) ? new Element(value) : new Element(null);
+    public Element this[string key] => new(_parsedArgs[key]);
+
+    /// <summary>
+    /// 批量获取参数（vararg）
+    /// </summary>
+    /// <param name="r">范围</param>
+    public Element[] this[Range r] {
+        get {
+            List<Element> elements = [];
+
+            int start = r.Start.IsFromEnd ? _parsedArgs.Count - r.Start.Value : r.Start.Value;
+            int end = r.End.IsFromEnd ? _parsedArgs.Count - r.End.Value : r.End.Value;
+
+            for (int i = start; i < end; i++) {
+                elements.Add(new Element(_parsedArgs[i]));
+            }
+
+            return elements.ToArray();
+        }
+    }
 
     public ParsedArgs(ArgumentMeta[] metas, string[] tokens) {
-        _parsedArgs = new Dictionary<string, dynamic?>();
+        _parsedArgs = new OrderedDictionary();
 
         string[] args = tokens[1..];
 
-        for (int i = 0; i < metas.Length; i++) {
-            (string simpleName, string name, Type? type, bool optional) = metas[i];
+        int i = 0;
+
+        for (; i < metas.Length; i++) {
+            (string simpleName, string name, Type type, bool optional) = metas[i];
 
             string? arg = i < 0 || i >= args.Length ? null : args[i];
 
@@ -37,6 +58,23 @@ public class ParsedArgs {
                 }
 
                 throw new CommandParseException($"参数 [{name}] 非法，需要 {type.Name}！");
+            }
+        }
+
+        (_, string lastName, Type lastType, _) = metas[^1];
+            
+        // 解析剩余参数
+        for (; i < args.Length; i++) {
+            try {
+                _parsedArgs[$"{i}_orphan"] = ConvertUtil.To(lastType, args[i]);
+            } catch (Exception) {
+                if (lastType.IsEnum) {
+                    string candidates = string.Join("|", Enum.GetNames(lastType).Select(n => n.ToLower()));
+
+                    throw new CommandParseException($"参数 [{lastName}] 非法，需要 {lastType.Name}！({candidates})");
+                }
+
+                throw new CommandParseException($"参数 [{lastName}] 非法，需要 {lastType.Name}！");
             }
         }
 
