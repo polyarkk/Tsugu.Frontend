@@ -4,6 +4,8 @@ using Tsugu.Lagrange.Util;
 namespace Tsugu.Lagrange.Command;
 
 public class ParsedArgs {
+    public string Alias { get; }
+    
     /// <summary>
     /// 所有参数连接得到的字符串
     /// </summary>
@@ -34,12 +36,15 @@ public class ParsedArgs {
 
     public ParsedArgs(ArgumentMeta[] metas, string[] tokens) {
         _parsedArgs = new OrderedDictionary();
-
+        
         if (tokens.Length <= 1) {
+            Alias = "";
             ConcatenatedArgs = "";
             
             return;
         }
+        
+        Alias = tokens[0];
 
         string[] args = tokens[1..];
 

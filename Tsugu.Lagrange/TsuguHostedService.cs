@@ -199,6 +199,10 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
 
         _logger.LogInformation("{msg}", sb.ToString());
 
-        await _messageResolver.InvokeCommand(ctx, e, chain, promptBuilder.ToString());
+        try {
+            await _messageResolver.InvokeCommand(ctx, e, chain, promptBuilder.ToString());
+        } catch (Exception ex) {
+            _logger.LogError("exception raised upon resolving message!\n{e}", ex.ToString());
+        }
     }
 }

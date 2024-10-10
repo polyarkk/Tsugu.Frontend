@@ -5,6 +5,7 @@ using Lagrange.Core.Message;
 using Lagrange.Core.Message.Entity;
 using Tsugu.Lagrange.Command;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 using System.Text;
@@ -15,7 +16,7 @@ using BindingFlags = System.Reflection.BindingFlags;
 namespace Tsugu.Lagrange;
 
 public class MessageResolver {
-    private readonly Dictionary<string, Type> _commands;
+    private readonly Dictionary<string, BaseCommand> _commands;
 
     private readonly ILogger<MessageResolver> _logger;
 
@@ -26,7 +27,7 @@ public class MessageResolver {
         IConfiguration configuration
     ) {
         _logger = logger;
-        _commands = new Dictionary<string, Type>();
+        _commands = new Dictionary<string, BaseCommand>();
         _appSettings = configuration.GetSection("Tsugu").Get<AppSettings>()!;
 
         LoadEndpoints();
@@ -34,6 +35,7 @@ public class MessageResolver {
 
     private void LoadEndpoints() {
         _commands.Clear();
+        GC.Collect();
 
         var typesWithApiCommand =
             from a in AppDomain.CurrentDomain.GetAssemblies()
@@ -50,9 +52,24 @@ public class MessageResolver {
 
                 continue;
             }
+            
+            ConstructorInfo? ctor = t.Type.GetConstructor(
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, []
+            );
+
+            if (ctor == null) {
+                _logger.LogWarning(
+                    "command constructor {a}::{a}() not found!",
+                    t.Type.Name, t.Type.Name
+                );
+
+                return;
+            }
+
+            BaseCommand command = (BaseCommand)ctor.Invoke(null);
 
             foreach (string alias in t.Attribute.Aliases) {
-                _commands[alias] = t.Type;
+                _commands[alias] = command;
             }
         }
     }
@@ -60,14 +77,14 @@ public class MessageResolver {
     private string GetHelpPlainText() {
         StringBuilder stringBuilder = new();
 
-        HashSet<Type> hashSet = [];
+        HashSet<BaseCommand> hashSet = [];
 
         stringBuilder.AppendLine("可用指令：");
 
         foreach (ApiCommandAttribute attr in
-            from apiType in _commands.Values
-            where hashSet.Add(apiType)
-            select apiType.GetCustomAttribute<ApiCommandAttribute>()!
+            from command in _commands.Values
+            where hashSet.Add(command)
+            select command.GetType().GetCustomAttribute<ApiCommandAttribute>()!
         ) {
             stringBuilder.AppendLine($" - {string.Join("|", attr.Aliases)}: {attr.Description}");
         }
@@ -140,24 +157,9 @@ public class MessageResolver {
             return;
         }
 
-        if (!_commands.TryGetValue(tokens[0], out Type? commandType)) {
+        if (!_commands.TryGetValue(tokens[0], out BaseCommand? api)) {
             return;
         }
-
-        ConstructorInfo? ctor = commandType.GetConstructor(
-            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, []
-        );
-
-        if (ctor == null) {
-            _logger.LogWarning(
-                "command constructor {a}::{a}() not found!",
-                commandType.Name, commandType.Name
-            );
-
-            return;
-        }
-
-        BaseCommand api = (BaseCommand)ctor.Invoke(null);
 
         if (tokens.Contains("--help")) {
             await context.SendPlainText(api.GetHelpText());

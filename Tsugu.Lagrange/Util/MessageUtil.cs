@@ -5,6 +5,12 @@ using Lagrange.Core.Message;
 namespace Tsugu.Lagrange.Util;
 
 internal static class MessageUtil {
+    public static MessageBuilder GetDefaultMessageBuilder(uint friendUin, uint? groupUin) {
+        return groupUin != null
+            ? MessageBuilder.Group((uint)groupUin).Mention(friendUin)
+            : MessageBuilder.Friend(friendUin);
+    }
+    
     public static MessageBuilder GetDefaultMessageBuilder(Context ctx) {
         return ctx.Event is GroupMessageEvent
             ? MessageBuilder.Group((uint)ctx.Chain.GroupUin!).Mention(ctx.Chain.FriendUin)
