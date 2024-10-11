@@ -1,4 +1,5 @@
-﻿using Tsugu.Lagrange.Util;
+﻿using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
 
@@ -12,7 +13,7 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class SongRandom : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        OptionalArgument<string>("keywords", "关键词"),
+        Argument<string>("keywords", "关键词").AsOptional(),
     ];
 
     protected async override Task Invoke(Context ctx, ParsedArgs args) {

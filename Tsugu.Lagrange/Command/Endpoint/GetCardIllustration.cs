@@ -1,5 +1,6 @@
 ﻿using Lagrange.Core.Common.Interface.Api;
 using Lagrange.Core.Message;
+using Tsugu.Lagrange.Command.Argument;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;

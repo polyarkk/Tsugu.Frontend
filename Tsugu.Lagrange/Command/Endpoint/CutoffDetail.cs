@@ -1,4 +1,5 @@
-﻿using Tsugu.Lagrange.Util;
+﻿using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
 
@@ -9,7 +10,7 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 public class CutoffDetail : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
         Argument<uint>("tier", "档位"),
-        OptionalArgument<uint>("eventId", "活动ID"),
+        Argument<uint>("eventId", "活动ID").AsOptional(),
     ];
 
     protected async override Task Invoke(Context ctx, ParsedArgs args) {

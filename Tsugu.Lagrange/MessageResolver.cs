@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using System.Reflection;
 using System.Text;
 using Tsugu.Api.Misc;
+using Tsugu.Lagrange.Command.Argument;
 using Tsugu.Lagrange.Util;
 using BindingFlags = System.Reflection.BindingFlags;
 
@@ -52,7 +53,7 @@ public class MessageResolver {
 
                 continue;
             }
-            
+
             ConstructorInfo? ctor = t.Type.GetConstructor(
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, []
             );
@@ -169,12 +170,13 @@ public class MessageResolver {
 
         try {
             await api.InvokePre(context, tokens);
-        } catch (CommandParseException e) {
+        } catch (ArgumentParseException e) {
             await context.SendPlainText(api.GetErrorAndHelpText(e.Message));
         } catch (EndpointCallException e) {
             await context.SendPlainText(e.Message);
         } catch (Exception e) {
             _logger.LogError("exception raised upon resolving command!\n{e}", e.ToString());
+            await context.SendPlainText($"后台异常！Endpoint: {api.GetType().Name}");
         }
     }
 }

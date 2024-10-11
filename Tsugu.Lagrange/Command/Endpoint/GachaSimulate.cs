@@ -1,4 +1,5 @@
-﻿using Tsugu.Lagrange.Util;
+﻿using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
 
@@ -8,8 +9,8 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class GachaSimulate : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        OptionalArgument<uint>("times", "次数"),
-        OptionalArgument<uint>("gachaId", "卡池ID"),
+        Argument<uint>("times", "次数").AsOptional(),
+        Argument<uint>("gachaId", "卡池ID").AsOptional(),
     ];
 
     protected async override Task Invoke(Context ctx, ParsedArgs args) {

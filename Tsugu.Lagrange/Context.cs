@@ -25,8 +25,6 @@ public class Context : IDisposable {
     private readonly Lazy<TsuguUser> _tsuguUser;
 
     public AppSettings AppSettings { get; }
-    
-    public ServiceProvider Services { get; }
 
     public BotContext Bot { get; }
 

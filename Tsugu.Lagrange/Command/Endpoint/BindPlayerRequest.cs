@@ -1,5 +1,6 @@
 ﻿using Tsugu.Api.Entity;
 using Tsugu.Api.Enum;
+using Tsugu.Lagrange.Command.Argument;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -16,7 +17,7 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 public class BindPlayerRequest : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
         Argument<uint>("playerId", "玩家ID"),
-        OptionalArgument<Server>("server", "服务器"),
+        Argument<Server>("server", "服务器").AsOptional(),
     ];
 
     protected async override Task Invoke(Context ctx, ParsedArgs args) {

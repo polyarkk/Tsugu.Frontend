@@ -1,4 +1,5 @@
-﻿using Tsugu.Lagrange.Util;
+﻿using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
 

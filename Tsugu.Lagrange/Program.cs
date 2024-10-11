@@ -1,10 +1,11 @@
-﻿global using ArgumentMeta = (string, string, System.Type, bool);
-using Tsugu.Lagrange;
+﻿using Tsugu.Lagrange;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using Tsugu.Lagrange.Command;
+using Tsugu.Lagrange.Util;
 
 if (!File.Exists("appsettings.json")) {
     Dictionary<string, dynamic> conf = new() {
@@ -35,5 +36,7 @@ builder.Services.AddScoped<BindPlayerVerificationTimer>();
 builder.Configuration.AddJsonFile("appsettings.json");
 
 IHost host = builder.Build();
+
+LoggerUtil.InitLoggerFactory(host.Services.GetService<ILoggerFactory>()!);
 
 await host.RunAsync();

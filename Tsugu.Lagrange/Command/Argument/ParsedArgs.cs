@@ -1,11 +1,11 @@
 ﻿using System.Collections.Specialized;
 using Tsugu.Lagrange.Util;
 
-namespace Tsugu.Lagrange.Command;
+namespace Tsugu.Lagrange.Command.Argument;
 
 public class ParsedArgs {
     public string Alias { get; }
-    
+
     /// <summary>
     /// 所有参数连接得到的字符串
     /// </summary>
@@ -36,59 +36,46 @@ public class ParsedArgs {
 
     public ParsedArgs(ArgumentMeta[] metas, string[] tokens) {
         _parsedArgs = new OrderedDictionary();
-        
-        if (tokens.Length <= 1) {
-            Alias = "";
-            ConcatenatedArgs = "";
-            
-            return;
-        }
-        
+
         Alias = tokens[0];
 
-        string[] args = tokens[1..];
+        string[] args = tokens.Length <= 1 ? [] : tokens[1..];
 
         ConcatenatedArgs = string.Join(" ", args);
 
         int i = 0;
 
         for (; i < metas.Length; i++) {
-            (string simpleName, string name, Type type, bool optional) = metas[i];
+            ArgumentMeta meta = metas[i];
 
             string? arg = i < 0 || i >= args.Length ? null : args[i];
 
-            if (!optional && arg == null) {
-                throw new CommandParseException($"未提供关键参数 [{name}]！");
+            if (!meta.Optional && arg == null) {
+                throw new ArgumentParseException($"未提供关键参数 [{meta.Name}]！");
             }
 
-            try {
-                _parsedArgs[simpleName] = ConvertUtil.To(type, arg);
-            } catch (Exception) {
-                if (type.IsEnum) {
-                    string candidates = string.Join("|", Enum.GetNames(type).Select(n => n.ToLower()));
-
-                    throw new CommandParseException($"参数 [{name}] 非法，需要 {type.Name}！({candidates})");
-                }
-
-                throw new CommandParseException($"参数 [{name}] 非法，需要 {type.Name}！");
-            }
+            ParseArgument(meta, arg);
         }
 
-        (_, string lastName, Type lastType, _) = metas[^1];
-            
+        ArgumentMeta lastMeta = metas[^1];
+
         // 解析剩余参数
         for (; i < args.Length; i++) {
-            try {
-                _parsedArgs[$"{i}_orphan"] = ConvertUtil.To(lastType, args[i]);
-            } catch (Exception) {
-                if (lastType.IsEnum) {
-                    string candidates = string.Join("|", Enum.GetNames(lastType).Select(n => n.ToLower()));
+            ParseArgument(lastMeta, args[i], i);
+        }
+    }
 
-                    throw new CommandParseException($"参数 [{lastName}] 非法，需要 {lastType.Name}！({candidates})");
-                }
+    private void ParseArgument(ArgumentMeta meta, string? arg, int? orphanIndex = null) {
+        try {
+            _parsedArgs[$"{meta.Key}{(orphanIndex != null ? $"_orphan_{orphanIndex}" : "")}"] = meta.InvokeMatcher(arg);
+        } catch (Exception) {
+            if (meta.Type.IsEnum) {
+                string candidates = string.Join("|", Enum.GetNames(meta.Type).Select(n => n.ToLower()));
 
-                throw new CommandParseException($"参数 [{lastName}] 非法，需要 {lastType.Name}！");
+                throw new ArgumentParseException($"参数 [{meta.Name}] 非法，需要 {meta.Type.Name}！({candidates})");
             }
+
+            throw new ArgumentParseException($"参数 [{meta.Name}] 非法，需要 {meta.Type.Name}！");
         }
     }
 

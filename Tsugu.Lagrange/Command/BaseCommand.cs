@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text;
+using Tsugu.Lagrange.Command.Argument;
 
 namespace Tsugu.Lagrange.Command;
 
@@ -29,10 +30,10 @@ public abstract class BaseCommand {
     private string GetArgumentHelpText() {
         StringBuilder argumentBuilder = new();
 
-        foreach ((_, string name, Type type, bool optional) in Arguments) {
-            char pre = optional ? '[' : '<';
-            char suf = optional ? ']' : '>';
-            argumentBuilder.Append($"{pre}{name}: {type.Name}{suf} ");
+        foreach (ArgumentMeta meta in Arguments) {
+            char pre = meta.Optional ? '[' : '<';
+            char suf = meta.Optional ? ']' : '>';
+            argumentBuilder.Append($"{pre}{meta.Name}: {meta.Type.Name}{suf} ");
         }
 
         argumentBuilder.Remove(argumentBuilder.Length - 1, 1);
@@ -66,10 +67,6 @@ public abstract class BaseCommand {
     }
 
     protected static ArgumentMeta Argument<T>(string key, string name) {
-        return (key, name, typeof(T), false);
-    }
-
-    protected static ArgumentMeta OptionalArgument<T>(string key, string name) {
-        return (key, name, typeof(T), true);
+        return new ArgumentMeta(key, name, typeof(T), false);
     }
 }
