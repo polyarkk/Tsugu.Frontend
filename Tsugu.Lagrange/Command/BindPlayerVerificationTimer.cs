@@ -74,7 +74,7 @@ public class BindPlayerVerificationTimer : Timer {
                 return;
             }
 
-            TsuguClient tsugu = new(_backendUrl);
+            using TsuguClient tsugu = new(_backendUrl);
 
             string userId = _friendUin.ToString();
 
