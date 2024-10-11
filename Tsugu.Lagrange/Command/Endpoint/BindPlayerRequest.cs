@@ -1,5 +1,4 @@
-﻿using Tsugu.Api.Entity;
-using Tsugu.Api.Enum;
+﻿using Tsugu.Api.Enum;
 using Tsugu.Lagrange.Command.Argument;
 using Tsugu.Lagrange.Util;
 
@@ -42,6 +41,7 @@ public class BindPlayerRequest : BaseCommand {
 
         uint verifyCode = await ctx.Tsugu.User.BindPlayerRequest(userId, Constant.Platform);
 
+        // todo check whether player id is valid (bestdori api or something)
         _ = new BindPlayerVerificationTimer(
             ctx.AppSettings.BackendUrl, ctx.Bot, ctx.Chain.GroupUin,
             ctx.Chain.FriendUin, args["playerId"].Get<uint>(),
@@ -52,7 +52,7 @@ public class BindPlayerRequest : BaseCommand {
             $"""
              已进入{(unbind ? "解除绑定" : "绑定")}流程，请在 1.5 分钟内将游戏账号的 *个性签名* 或者 *当前使用的乐队编队名称* 改为
              {verifyCode}
-             结束后后将自动进入验证流程并返回结果
+             期间将自动进行验证流程并返回结果
              """
         );
     }

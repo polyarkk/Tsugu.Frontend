@@ -47,6 +47,11 @@ public class TsuguUser {
     /// 是否转发该用户的房间号。false 则会忽视来自该用户的房间号。
     /// </summary>
     public bool ShareRoomNumber { get; set; }
+    
+    /// <summary>
+    /// 主账号
+    /// </summary>
+    public int UserPlayerIndex { get; set; }
 
     /// <summary>
     /// 该用户绑定的服务器数据列表。

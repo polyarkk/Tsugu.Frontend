@@ -25,9 +25,11 @@ public class UserEndpoint(TsuguHttpClient client) {
     /// <param name="mainServer">用户的主服务器模式。</param>
     /// <param name="displayedServerList">用户的默认服务器列表。</param>
     /// <param name="shareRoomNumber">是否转发该用户的房间号。false 则会忽视来自该用户的房间号。</param>
+    /// <param name="userPlayerIndex">用户的主账号。</param>
     public async Task ChangeUserData(
         string userId, string platform,
-        Server? mainServer = null, Server[]? displayedServerList = null, bool? shareRoomNumber = null
+        Server? mainServer = null, Server[]? displayedServerList = null, 
+        bool? shareRoomNumber = null, int? userPlayerIndex = null
     ) {
         Dictionary<string, object> o = new();
 
@@ -41,6 +43,10 @@ public class UserEndpoint(TsuguHttpClient client) {
 
         if (shareRoomNumber != null) {
             o["shareRoomNumber"] = shareRoomNumber;
+        }
+
+        if (userPlayerIndex != null) {
+            o["userPlayerIndex"] = userPlayerIndex;
         }
 
         await client.StationSend(

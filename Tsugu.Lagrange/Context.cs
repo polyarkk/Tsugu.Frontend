@@ -1,7 +1,5 @@
 ﻿using Lagrange.Core;
-using Lagrange.Core.Event;
 using Lagrange.Core.Message;
-using Microsoft.Extensions.DependencyInjection;
 using Tsugu.Api;
 using Tsugu.Api.Entity;
 

@@ -4,7 +4,7 @@ using Tsugu.Lagrange.Util;
 namespace Tsugu.Lagrange.Command.Argument;
 
 public class ArgumentMeta {
-    private static ILogger<ArgumentMeta> Logger = LoggerUtil.GetLogger<ArgumentMeta>();
+    private readonly static ILogger<ArgumentMeta> Logger = LoggerUtil.GetLogger<ArgumentMeta>();
     
     public ArgumentMeta(string key, string name, Type type, bool optional) {
         Key = key;

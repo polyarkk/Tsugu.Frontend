@@ -14,9 +14,9 @@ public class TsuguHttpClient : HttpClient {
     /// <returns>图片 Base64 数组</returns>
     /// <exception cref="EndpointCallException">任何原因导致获取到的不是图片则抛出此异常</exception>
     public async Task<string[]> TsuguPost(string endpoint, object? @params = null) {
-        string content = await BaseHttpCall(HttpMethod.Post, endpoint, @params ?? new { });
-
-        ImageRestResponse[] imageRestResponses = content.DeserializeJson<ImageRestResponse[]>()!;
+        ImageRestResponse[] imageRestResponses =
+            await BaseHttpCall<ImageRestResponse[]>(HttpMethod.Post, endpoint, @params ?? new { })
+            ?? throw new EndpointCallException("null");
 
         if (imageRestResponses.Length == 0) {
             return [];
@@ -47,9 +47,9 @@ public class TsuguHttpClient : HttpClient {
     public async Task<T> StationSend<T>(
         HttpMethod method, string endpoint, object? @params = null
     ) {
-        string content = await BaseHttpCall(method, endpoint, @params ?? new { });
-
-        StationRestResponse stationRestResponse = content.DeserializeJson<StationRestResponse>()!;
+        StationRestResponse stationRestResponse =
+            await BaseHttpCall<StationRestResponse>(method, endpoint, @params ?? new { })
+            ?? throw new EndpointCallException("null");
 
         if (!stationRestResponse.IsSuccess) {
             throw new EndpointCallException(stationRestResponse.Data.GetString());
@@ -62,16 +62,16 @@ public class TsuguHttpClient : HttpClient {
     public async Task StationSend(
         HttpMethod method, string endpoint, object? @params = null
     ) {
-        string content = await BaseHttpCall(method, endpoint, @params ?? new { });
-
-        StationRestResponse stationRestResponse = content.DeserializeJson<StationRestResponse>()!;
+        StationRestResponse stationRestResponse =
+            await BaseHttpCall<StationRestResponse>(method, endpoint, @params ?? new { })
+            ?? throw new EndpointCallException("null");
 
         if (!stationRestResponse.IsSuccess) {
             throw new EndpointCallException(stationRestResponse.Data.GetString());
         }
     }
 
-    private async Task<string> BaseHttpCall(HttpMethod method, string endpoint, object? @params) {
+    private async Task<T?> BaseHttpCall<T>(HttpMethod method, string endpoint, object? @params) {
         string json = @params.SerializeJson();
 
         HttpRequestMessage msg = new(method, $"{endpoint}");
@@ -84,12 +84,16 @@ public class TsuguHttpClient : HttpClient {
 
         string content = await response.Content.ReadAsStringAsync();
 
-        if (response.StatusCode != HttpStatusCode.OK) {
+        if (response.StatusCode == HttpStatusCode.OK) {
+            return content.DeserializeJson<T>();
+        }
+
+        try {
+            return content.DeserializeJson<T>();
+        } catch {
             throw new EndpointCallException(
                 $"failed to fetch data from endpoint [{endpoint}], status: {response.StatusCode}, message: {content}"
             );
         }
-
-        return content;
     }
 }

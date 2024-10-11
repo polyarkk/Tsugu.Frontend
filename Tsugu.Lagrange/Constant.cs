@@ -1,5 +1,5 @@
 ﻿namespace Tsugu.Lagrange;
 
-public class Constant {
+public static class Constant {
     public const string Platform = "red";
 }

@@ -1,5 +1,4 @@
 ﻿using Lagrange.Core.Common.Interface.Api;
-using Lagrange.Core.Event.EventArg;
 using Lagrange.Core.Message;
 
 namespace Tsugu.Lagrange.Util;
