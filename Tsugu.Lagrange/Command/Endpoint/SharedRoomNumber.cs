@@ -17,7 +17,7 @@ public class SharedRoomNumber : BaseCommand {
         
         await ctx.Tsugu.User.ChangeUserData(
             ctx.TsuguUser.UserId,
-            sharedRoomNumber: toggle
+            shareRoomNumber: toggle
         );
 
         await ctx.SendPlainText($"已{(toggle ? "开启" : "关闭")}个人车牌转发");

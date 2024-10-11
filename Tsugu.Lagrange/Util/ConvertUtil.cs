@@ -12,7 +12,7 @@ public static class ConvertUtil {
             return null;
         }
 
-        object? converted = null;
+        object? converted;
 
         if (type.IsEnum) {
             string str = Convert.ToString(o) ?? "null";
