@@ -18,7 +18,7 @@ public class PlayerStatus : BaseCommand {
         Argument<Server>("server", "服务器").AsOptional(),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         Server server = args["server"].GetOr(() => ctx.TsuguUser.MainServer);
 
         foreach (TsuguUser.TsuguUserServerInList item in ctx.TsuguUser.UserPlayerList) {

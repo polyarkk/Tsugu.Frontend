@@ -20,7 +20,7 @@ public class BindPlayerRequest : BaseCommand {
         Argument<Server>("server", "服务器").AsOptional(),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         Server server = args["server"].GetOr(() => ctx.TsuguUser.MainServer);
         bool unbind = args.Alias == "解除绑定";
         bool bound = ctx.TsuguUser.UserPlayerList.Any(player => player.Server == server);

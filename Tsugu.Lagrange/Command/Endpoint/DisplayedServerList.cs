@@ -13,7 +13,7 @@ public class DisplayedServerList : BaseCommand {
         Argument<Server>("displayedServerList", "默认服务器"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         Server[] displayedServerList = args[..]
             .Select(e => e.Get<Server>()).ToArray();
 

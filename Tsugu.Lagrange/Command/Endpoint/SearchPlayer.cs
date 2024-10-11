@@ -18,7 +18,7 @@ public class SearchPlayer : BaseCommand {
         Argument<Server>("server", "服务器").AsOptional(),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SearchPlayer(
             args["playerId"].Get<uint>(),
             args["server"].GetOr(() => ctx.TsuguUser.MainServer),

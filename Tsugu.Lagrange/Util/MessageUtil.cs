@@ -12,7 +12,7 @@ internal static class MessageUtil {
     }
     
     public static MessageBuilder GetDefaultMessageBuilder(Context ctx) {
-        return ctx.Event is GroupMessageEvent
+        return ctx.MessageType == MessageType.Group
             ? MessageBuilder.Group((uint)ctx.Chain.GroupUin!).Mention(ctx.Chain.FriendUin)
             : MessageBuilder.Friend(ctx.Chain.FriendUin);
     }

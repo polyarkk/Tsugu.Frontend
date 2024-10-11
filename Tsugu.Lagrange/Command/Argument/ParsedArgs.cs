@@ -34,12 +34,12 @@ public class ParsedArgs {
         }
     }
 
-    public ParsedArgs(ArgumentMeta[] metas, string[] tokens) {
+    public ParsedArgs(ArgumentMeta[] metas, List<string> tokens) {
         _parsedArgs = new OrderedDictionary();
 
         Alias = tokens[0];
 
-        string[] args = tokens.Length <= 1 ? [] : tokens[1..];
+        List<string> args = tokens.Count <= 1 ? [] : tokens[1..];
 
         ConcatenatedArgs = string.Join(" ", args);
 
@@ -48,7 +48,7 @@ public class ParsedArgs {
         for (; i < metas.Length; i++) {
             ArgumentMeta meta = metas[i];
 
-            string? arg = i < 0 || i >= args.Length ? null : args[i];
+            string? arg = i < 0 || i >= args.Count ? null : args[i];
 
             if (!meta.Optional && arg == null) {
                 throw new ArgumentParseException($"未提供关键参数 [{meta.Name}]！");
@@ -60,7 +60,7 @@ public class ParsedArgs {
         ArgumentMeta lastMeta = metas[^1];
 
         // 解析剩余参数
-        for (; i < args.Length; i++) {
+        for (; i < args.Count; i++) {
             ParseArgument(lastMeta, args[i], i);
         }
     }

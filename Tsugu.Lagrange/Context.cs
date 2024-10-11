@@ -11,12 +11,12 @@ public class Context : IDisposable {
     public Context(
         AppSettings appAppSettings,
         BotContext botContext,
-        EventBase @event,
+        MessageType messageType,
         MessageChain messageChain
     ) {
         AppSettings = appAppSettings;
         Bot = botContext;
-        Event = @event;
+        MessageType = messageType;
         Chain = messageChain;
         Tsugu = new TsuguClient(appAppSettings.BackendUrl);
         _tsuguUser = new Lazy<TsuguUser>(() => Tsugu.User.GetUserData(Chain.FriendUin.ToString()).Result);
@@ -28,7 +28,7 @@ public class Context : IDisposable {
 
     public BotContext Bot { get; }
 
-    public EventBase Event { get; }
+    public MessageType MessageType { get; }
 
     public MessageChain Chain { get; }
 

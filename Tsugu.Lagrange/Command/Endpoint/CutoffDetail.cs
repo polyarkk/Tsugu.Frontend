@@ -13,7 +13,7 @@ public class CutoffDetail : BaseCommand {
         Argument<uint>("eventId", "活动ID").AsOptional(),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.CutoffDetail(
             ctx.TsuguUser.MainServer,
             args["tier"].Get<uint>(),

@@ -5,11 +5,12 @@ using Lagrange.Core.Common.Interface.Api;
 using Lagrange.Core.Event;
 using Lagrange.Core.Event.EventArg;
 using Lagrange.Core.Message;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using QRCoder;
-using System.Text;
 using System.Text.Json;
+using Tsugu.Lagrange.Filter;
 
 namespace Tsugu.Lagrange;
 
@@ -18,23 +19,20 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
 
     private readonly ILogger _logger;
 
-    private readonly MessageResolver _messageResolver;
-
     private readonly Timer _gcTimer;
+
+    private readonly List<IFilter> _filters;
 
     private BotKeystore _keyStore;
 
     private bool _needQrCodeLogin;
 
-    public TsuguHostedService(
-        ILogger<TsuguHostedService> logger,
-        MessageResolver messageResolver
-    ) {
+    public TsuguHostedService(ILogger<TsuguHostedService> logger, IConfiguration configuration) {
         _logger = logger;
         _logger.LogInformation("--- TSUGU FRONTEND IS NOW STARTING!!! ---");
-        _messageResolver = messageResolver;
+        _filters = [];
         _gcTimer = new Timer(_ => GC.Collect(), null, TimeSpan.FromMinutes(30), TimeSpan.FromMinutes(30));
-
+        
         BotDeviceInfo deviceInfo;
 
         if (!File.Exists("device.dat")) {
@@ -62,6 +60,13 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
         }
 
         _botContext = BotFactory.Create(new BotConfig(), deviceInfo, _keyStore);
+
+        RegisterFilter(new AuditFilter());
+        RegisterFilter(new CommandFilter(configuration));
+    }
+
+    private void RegisterFilter(IFilter filter) {
+        _filters.Add(filter);
     }
 
     public void Dispose() {
@@ -136,7 +141,7 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
 
         File.Delete("login-qr.png");
         await File.WriteAllBytesAsync("login-qr.png", qrCodePng);
-        _logger.LogInformation("note: you can also scan qr code through png file generated in working dir");
+        _logger.LogInformation("note: you can also scan qr code through [login-qr.png] generated in working dir");
 
         await _botContext.LoginByQrCode();
 
@@ -165,13 +170,15 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
 
     private async void OnMessageReceived<TMessageEvent>(BotContext ctx, TMessageEvent e)
     where TMessageEvent : EventBase {
-        // todo separate audit logic to another method
         MessageChain chain;
+        MessageType type;
 
         if (e is FriendMessageEvent fe) {
             chain = fe.Chain;
+            type = MessageType.Friend;
         } else if (e is GroupMessageEvent ge) {
             chain = ge.Chain;
+            type = MessageType.Group;
         } else {
             return;
         }
@@ -180,29 +187,12 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
             return;
         }
 
-        StringBuilder sb = new();
-
-        if (chain.GroupUin != null) {
-            sb.AppendLine($"group          : {chain.GroupUin}");
-            sb.AppendLine($"user           : {chain.GroupMemberInfo?.MemberName}({chain.GroupMemberInfo?.Uin})");
-        } else {
-            sb.AppendLine($"user           : {chain.FriendInfo?.Nickname}({chain.FriendInfo?.Uin})");
-        }
-
-        StringBuilder promptBuilder = new();
-
-        foreach (IMessageEntity entity in chain) {
-            promptBuilder.Append(entity.ToPreviewText());
-        }
-
-        sb.Append($"preview text   : {promptBuilder.ToString()}");
-
-        _logger.LogInformation("{msg}", sb.ToString());
-
-        try {
-            await _messageResolver.InvokeCommand(ctx, e, chain, promptBuilder.ToString());
-        } catch (Exception ex) {
-            _logger.LogError("exception raised upon resolving message!\n{e}", ex.ToString());
+        foreach (IFilter filter in _filters) {
+            try {
+                await filter.DoFilterAsync(ctx, chain, type);
+            } catch (Exception ex) {
+                _logger.LogError("exception raised upon handling filter [{filter}]!\n{e}", filter.GetType().Name, ex.ToString());
+            }
         }
     }
 }

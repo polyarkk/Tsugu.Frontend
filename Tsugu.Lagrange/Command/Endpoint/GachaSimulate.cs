@@ -13,7 +13,7 @@ public class GachaSimulate : BaseCommand {
         Argument<uint>("gachaId", "卡池ID").AsOptional(),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.GachaSimulate(
             ctx.TsuguUser.MainServer,
             args["gachaId"].GetOrNull<uint>(),

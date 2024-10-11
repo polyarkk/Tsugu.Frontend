@@ -12,7 +12,7 @@ public class SharedRoomNumber : BaseCommand {
         Argument<bool>("toggle", "是否开启"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         bool toggle = args["toggle"].Get<bool>();
         
         await ctx.Tsugu.User.ChangeUserData(

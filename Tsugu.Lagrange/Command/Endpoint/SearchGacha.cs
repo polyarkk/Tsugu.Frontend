@@ -13,7 +13,7 @@ public class SearchGacha : BaseCommand {
         Argument<uint>("gachaId", "卡池ID"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SearchGacha(
             ctx.TsuguUser.DisplayedServerList,
             args["gachaId"].Get<uint>(),

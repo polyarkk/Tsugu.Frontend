@@ -16,7 +16,7 @@ public class SearchEvent : BaseCommand {
         Argument<string>("keywords", "关键词"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SearchEvent(
             ctx.TsuguUser.DisplayedServerList,
             args.ConcatenatedArgs,

@@ -14,7 +14,7 @@ public class GetCardIllustration : BaseCommand {
         Argument<uint>("cardId", "卡面ID"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         string[] base64List = await ctx.Tsugu.Query.GetCardIllustration(args["cardId"].Get<uint>());
 
         MessageBuilder messageBuilder = MessageUtil.GetDefaultMessageBuilder(ctx);

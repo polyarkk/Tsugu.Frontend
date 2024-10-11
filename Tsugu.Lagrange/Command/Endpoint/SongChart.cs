@@ -28,7 +28,7 @@ public class SongChart : BaseCommand {
             }),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SongChart(
             ctx.TsuguUser.DisplayedServerList,
             args["songId"].Get<uint>(),

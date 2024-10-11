@@ -13,7 +13,7 @@ public class MainServer : BaseCommand {
         Argument<Server>("mainServer", "若干主服务器"),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         Server mainServer = args["mainServer"].Get<Server>();
 
         await ctx.Tsugu.User.ChangeUserData(

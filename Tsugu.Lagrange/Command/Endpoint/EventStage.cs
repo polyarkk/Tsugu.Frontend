@@ -21,7 +21,7 @@ public class EventStage : BaseCommand {
         Argument<Server>("mainServer", "服务器").AsOptional(),
     ];
 
-    protected async override Task Invoke(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.EventStage(
             args["mainServer"].GetOr(() => ctx.TsuguUser.MainServer),
             args["eventId"].GetOrNull<uint>(),

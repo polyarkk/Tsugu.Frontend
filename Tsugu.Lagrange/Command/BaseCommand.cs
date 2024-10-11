@@ -5,15 +5,15 @@ using Tsugu.Lagrange.Command.Argument;
 namespace Tsugu.Lagrange.Command;
 
 public abstract class BaseCommand {
-    protected abstract Task Invoke(Context ctx, ParsedArgs args);
+    protected abstract Task InvokeInternal(Context ctx, ParsedArgs args);
 
     /// <summary>
     /// 参数，注意可选参数一定要在必需参数之后，否则会出现异常
     /// </summary>
     protected virtual ArgumentMeta[] Arguments { get; } = [];
     
-    public async Task InvokePre(Context ctx, string[] tokens) {
-        await Invoke(ctx, new ParsedArgs(Arguments, tokens));
+    public async Task Invoke(Context ctx, List<string> tokens) {
+        await InvokeInternal(ctx, new ParsedArgs(Arguments, tokens));
     }
 
     private ApiCommandAttribute GetAttribute() {
