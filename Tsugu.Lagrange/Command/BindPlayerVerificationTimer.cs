@@ -119,7 +119,7 @@ public class BindPlayerVerificationTimer : Timer {
             }
 
             // success
-            string reply = $"玩家 [{_playerId}] 已绑定成功！";
+            string reply = _unbind ? "解绑成功" : "绑定成功，现在可以使用 *玩家状态* 命令查看绑定的玩家状态";
 
             // 若解绑且userPlayerIndex == userPlayerList.Length - 1，重置userPlayerIndex防止数组越界
             if (_unbind) {
