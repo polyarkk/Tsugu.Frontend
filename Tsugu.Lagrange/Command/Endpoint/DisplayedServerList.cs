@@ -22,6 +22,6 @@ public class DisplayedServerList : BaseCommand {
             displayedServerList: displayedServerList
         );
 
-        await ctx.SendPlainText($"默认服务器排序已设定为：{string.Join(", ", displayedServerList.Select(e => e.ToString().ToLower()))}");
+        await ctx.SendPlainText($"默认服务器排序已设定为：{string.Join(", ", displayedServerList.Select(e => e.ToLowerString()))}");
     }
 }

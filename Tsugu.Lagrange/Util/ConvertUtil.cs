@@ -26,4 +26,8 @@ public static class ConvertUtil {
 
         return converted;
     }
+
+    public static string ToLowerString(this Enum e) {
+        return e.ToString().ToLower();
+    }
 }

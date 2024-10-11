@@ -26,13 +26,13 @@ public class BindPlayerRequest : BaseCommand {
         bool bound = ctx.TsuguUser.UserPlayerList.Any(player => player.Server == server);
 
         if (!unbind && bound) {
-            await ctx.SendPlainText($"服务器 [{server.ToString().ToLower()}] 已绑定过玩家！");
+            await ctx.SendPlainText($"服务器 [{server.ToLowerString()}] 已绑定过玩家！");
 
             return;
         }
 
         if (unbind && !bound) {
-            await ctx.SendPlainText($"服务器 [{server.ToString().ToLower()}] 没有绑定过玩家！");
+            await ctx.SendPlainText($"服务器 [{server.ToLowerString()}] 没有绑定过玩家！");
 
             return;
             

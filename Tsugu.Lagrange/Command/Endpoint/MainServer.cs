@@ -21,6 +21,6 @@ public class MainServer : BaseCommand {
             mainServer: mainServer
         );
 
-        await ctx.SendPlainText($"主服务器已设定为：{mainServer.ToString().ToLower()}");
+        await ctx.SendPlainText($"主服务器已设定为：{mainServer.ToLowerString()}");
     }
 }

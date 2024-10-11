@@ -215,17 +215,17 @@ public class QueryEndpoint(TsuguHttpClient client) {
     /// 查询指定服务器的指定玩家的状态图片。仅能查询到已公开的信息。
     /// </summary>
     /// <param name="playerId">查询的玩家 ID。</param>
-    /// <param name="displayedServerList">默认服务器列表，将会按顺序查询第一个有效的服务器。</param>
+    /// <param name="mainServer">玩家所在的服务器。</param>
     /// <param name="useEasyBg">是否使用简易背景。false 即为不使用简易背景，此时后端图片生成耗时可能会大幅增加。</param>
     /// <param name="compress">是否在后端压缩图像，压缩图像可以加快传输速度，但是会降低图片清晰度。</param>
     /// <returns>图片 Base64</returns>
     public async Task<string> SearchPlayer(
-        uint playerId, Server[] displayedServerList, bool useEasyBg = false, bool compress = true
+        uint playerId, Server mainServer, bool useEasyBg = false, bool compress = true
     ) {
         return (await client.TsuguPost("/searchPlayer",
             new {
                 PlayerId = playerId,
-                DisplayedServerList = displayedServerList,
+                MainServer = mainServer,
                 UseEasyBG = useEasyBg,
                 Compress = compress,
             }

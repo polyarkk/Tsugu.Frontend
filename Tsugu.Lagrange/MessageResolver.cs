@@ -152,7 +152,7 @@ public class MessageResolver {
 
         if (string.Equals(tokens[0], "tsugu_help", StringComparison.OrdinalIgnoreCase)) {
             await context.SendPlainText(
-                $"当前主服务器: {context.TsuguUser.MainServer.ToString().ToLower()}\n{GetHelpPlainText()}"
+                $"当前主服务器: {context.TsuguUser.MainServer.ToLowerString()}\n{GetHelpPlainText()}"
             );
 
             return;
