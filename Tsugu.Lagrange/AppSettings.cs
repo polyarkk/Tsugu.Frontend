@@ -30,7 +30,12 @@ public class AppSettings {
     /// <summary>
     /// 群聊天是否需要被@才会触发指令
     /// </summary>
-    public bool NeedMentioned { get; set; } = true;
+    public bool NeedMentioned { get; set; }
+
+    /// <summary>
+    /// 机器人管理员
+    /// </summary>
+    public uint[] Admins { get; set; } = [];
 
     public bool IsGroupWhitelisted(uint? groupUin) {
         // 忽略私聊情况

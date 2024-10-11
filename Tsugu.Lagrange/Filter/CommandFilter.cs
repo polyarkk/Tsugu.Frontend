@@ -18,7 +18,7 @@ public class CommandFilter : IFilter {
 
     private readonly static ILogger<CommandFilter> Logger = LoggerUtil.GetLogger<CommandFilter>();
 
-    private readonly AppSettings _appSettings;
+    private AppSettings _appSettings;
 
     private readonly IConfiguration _configuration;
 
@@ -67,15 +67,18 @@ public class CommandFilter : IFilter {
 
         using Context context = new(_appSettings, botContext, messageType, messageChain);
 
-        if (string.Equals(tokens[0], "tsugu_reload_appsettings", StringComparison.OrdinalIgnoreCase)) {
-            // todo
-            // await context.SendPlainText("已重新加载配置信息");
+        bool isAdmin = _appSettings.Admins.Contains(messageChain.FriendUin);
+
+        if (isAdmin && string.Equals(tokens[0], "tsugu_reload_appsettings", StringComparison.OrdinalIgnoreCase)) {
+            _appSettings = _configuration.GetSection("Tsugu").Get<AppSettings>()!;
+                
+            await context.SendPlainText("已重新加载配置信息");
 
             return;
         }
 
 #if DEBUG
-        if (string.Equals(tokens[0], "tsugu_reload_commands", StringComparison.OrdinalIgnoreCase)) {
+        if (isAdmin && string.Equals(tokens[0], "tsugu_reload_commands", StringComparison.OrdinalIgnoreCase)) {
             LoadEndpoints();
 
             await context.SendPlainText("已重新加载指令集\n" + GetHelpPlainText());
