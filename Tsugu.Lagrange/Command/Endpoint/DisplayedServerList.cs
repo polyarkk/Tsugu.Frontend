@@ -18,7 +18,7 @@ public class DisplayedServerList : BaseCommand {
             .Select(e => e.Get<Server>()).ToArray();
 
         await ctx.Tsugu.User.ChangeUserData(
-            ctx.TsuguUser.UserId,
+            ctx.TsuguUser.UserId, Constant.Platform,
             displayedServerList: displayedServerList
         );
 

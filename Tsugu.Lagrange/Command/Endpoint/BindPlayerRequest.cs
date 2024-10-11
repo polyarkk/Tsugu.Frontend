@@ -40,7 +40,7 @@ public class BindPlayerRequest : BaseCommand {
 
         string userId = ctx.Chain.FriendUin.ToString();
 
-        uint verifyCode = await ctx.Tsugu.User.BindPlayerRequest(userId);
+        uint verifyCode = await ctx.Tsugu.User.BindPlayerRequest(userId, Constant.Platform);
 
         _ = new BindPlayerVerificationTimer(
             ctx.AppSettings.BackendUrl, ctx.Bot, ctx.Chain.GroupUin,

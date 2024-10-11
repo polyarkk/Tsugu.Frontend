@@ -17,7 +17,7 @@ public class MainServer : BaseCommand {
         Server mainServer = args["mainServer"].Get<Server>();
 
         await ctx.Tsugu.User.ChangeUserData(
-            ctx.TsuguUser.UserId,
+            ctx.TsuguUser.UserId, Constant.Platform,
             mainServer: mainServer
         );
 

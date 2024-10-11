@@ -6,17 +6,12 @@ namespace Tsugu.Api.Endpoint;
 
 public class UserEndpoint(TsuguHttpClient client) {
     /// <summary>
-    /// QQ、Onebot、Chronocat 的平台名称。
-    /// </summary>
-    private const string Platform = "red";
-
-    /// <summary>
     /// 获取指定用户的数据。
     /// </summary>
     /// <param name="userId">用户的 ID。</param>
     /// <param name="platform">用户的平台名称。</param>
     /// <returns>用户数据</returns>
-    public async Task<TsuguUser> GetUserData(string userId, string platform = Platform) {
+    public async Task<TsuguUser> GetUserData(string userId, string platform) {
         return await client.StationSend<TsuguUser>(
             HttpMethod.Post, "/user/getUserData", new { UserId = userId, Platform = platform }
         );
@@ -31,7 +26,7 @@ public class UserEndpoint(TsuguHttpClient client) {
     /// <param name="displayedServerList">用户的默认服务器列表。</param>
     /// <param name="shareRoomNumber">是否转发该用户的房间号。false 则会忽视来自该用户的房间号。</param>
     public async Task ChangeUserData(
-        string userId, string platform = Platform,
+        string userId, string platform,
         Server? mainServer = null, Server[]? displayedServerList = null, bool? shareRoomNumber = null
     ) {
         Dictionary<string, object> o = new();
@@ -60,7 +55,7 @@ public class UserEndpoint(TsuguHttpClient client) {
     /// <param name="userId">用户的 ID。</param>
     /// <param name="platform">用户的平台名称。</param>
     /// <returns>验证码</returns>
-    public async Task<uint> BindPlayerRequest(string userId, string platform = Platform) {
+    public async Task<uint> BindPlayerRequest(string userId, string platform) {
         VerifyCode verifyCode = await client.StationSend<VerifyCode>(
             HttpMethod.Post, "/user/bindPlayerRequest",
             new {
@@ -78,11 +73,11 @@ public class UserEndpoint(TsuguHttpClient client) {
     /// <param name="userId">用户的 ID。</param>
     /// <param name="server">要绑定的服务器。</param>
     /// <param name="playerId">要进行操作的玩家 ID。</param>
-    /// <param name="unbind">是否进行解绑操作。</param>
     /// <param name="platform">用户的平台名称。</param>
+    /// <param name="unbind">是否进行解绑操作。</param>
     /// <exception cref="EndpointCallException">任何原因导致绑定/解绑失败都将抛出异常</exception>
     public async Task BindPlayerVerification(
-        string userId, Server server, uint playerId, bool unbind = false, string platform = Platform
+        string userId, Server server, uint playerId, string platform, bool unbind = false
     ) {
         await client.StationSend(
             HttpMethod.Post, "/user/bindPlayerVerification",

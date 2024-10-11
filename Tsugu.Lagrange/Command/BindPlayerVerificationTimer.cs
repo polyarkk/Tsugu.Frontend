@@ -70,7 +70,7 @@ public class BindPlayerVerificationTimer : Timer {
                 TsuguClient tsugu = new(_backendUrl);
 
                 Task task = tsugu.User.BindPlayerVerification(
-                    _friendUin.ToString(), _mainServer, _playerId, _unbind
+                    _friendUin.ToString(), _mainServer, _playerId, Constant.Platform, _unbind
                 );
 
                 string reply = $"玩家 [{_playerId}] 已绑定成功！";

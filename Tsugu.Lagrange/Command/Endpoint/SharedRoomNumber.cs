@@ -14,9 +14,9 @@ public class SharedRoomNumber : BaseCommand {
 
     protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         bool toggle = args["toggle"].Get<bool>();
-        
+
         await ctx.Tsugu.User.ChangeUserData(
-            ctx.TsuguUser.UserId,
+            ctx.TsuguUser.UserId, Constant.Platform,
             shareRoomNumber: toggle
         );
 

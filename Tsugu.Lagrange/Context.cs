@@ -19,7 +19,7 @@ public class Context : IDisposable {
         MessageType = messageType;
         Chain = messageChain;
         Tsugu = new TsuguClient(appAppSettings.BackendUrl);
-        _tsuguUser = new Lazy<TsuguUser>(() => Tsugu.User.GetUserData(Chain.FriendUin.ToString()).Result);
+        _tsuguUser = new Lazy<TsuguUser>(() => Tsugu.User.GetUserData(Chain.FriendUin.ToString(), Constant.Platform).Result);
     }
 
     private readonly Lazy<TsuguUser> _tsuguUser;
