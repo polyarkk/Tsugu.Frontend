@@ -7,7 +7,7 @@ namespace Tsugu.Lagrange.Command.Endpoint;
     Aliases = ["车牌转发", "设置车牌转发"],
     Description = "开启/关闭个人车牌转发"
 )]
-public class SharedRoomNumber : BaseCommand {
+public class ShareRoomNumber : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
         Argument<bool>("toggle", "是否开启"),
     ];

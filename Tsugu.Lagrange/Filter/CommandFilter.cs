@@ -154,7 +154,11 @@ public class CommandFilter : IFilter {
             BaseCommand command = (BaseCommand)ctor.Invoke(null);
 
             foreach (string alias in t.Attribute.Aliases) {
-                _commands[alias] = command;
+                if (!string.IsNullOrWhiteSpace(alias)) {
+                    _commands[alias] = command;
+                } else {
+                    Logger.LogWarning("empty alias string detected! command: {type}", t.Type.Name);
+                }
             }
         }
     }

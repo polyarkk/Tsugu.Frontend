@@ -17,7 +17,7 @@ internal static class MessageUtil {
     }
 
     public async static Task SendPlainText(this Context ctx, string str) {
-        await ctx.Bot.SendMessage(GetDefaultMessageBuilder(ctx).Text(str).Build());
+        await ctx.Bot.SendMessage(GetDefaultMessageBuilder(ctx).Text(" " + str).Build());
     }
 
     public async static Task SendImage(this Context ctx, string base64) {

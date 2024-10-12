@@ -187,6 +187,11 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
             return;
         }
 
+        // ignore official bot
+        if (chain.FriendUin == 3889000770) {
+            return;
+        }
+
         foreach (IFilter filter in _filters) {
             try {
                 await filter.DoFilterAsync(ctx, chain, type);

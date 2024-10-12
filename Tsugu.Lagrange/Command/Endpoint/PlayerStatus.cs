@@ -9,31 +9,45 @@ namespace Tsugu.Lagrange.Command.Endpoint;
     Aliases = ["玩家状态"],
     Description = "查询自己的玩家状态",
     Example = """
-              玩家状态：查询你当前默认服务器的玩家状态
-              玩家状态 jp：查询日服玩家状态
+              玩家状态：查询你当前主账号的玩家状态
+              玩家状态 2：查询在第二个绑定的玩家的状态
+              玩家状态 2 jp：查询在日服绑定的第二个玩家的状态
               """
 )]
 public class PlayerStatus : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
+        Argument<uint>("index", "玩家编号").AsOptional(),
         Argument<Server>("server", "服务器").AsOptional()
             .WithMatcher(ArgumentMatchers.ToServerEnumMatcher),
     ];
 
     protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
-        Server server = args["server"].GetOr(() => ctx.TsuguUser.MainServer);
+        uint index = args["index"].GetOr(() => 0u);
+        Server? server = args["server"].GetOrNull<Server>();
 
-        foreach (TsuguUser.TsuguUserServerInList item in ctx.TsuguUser.UserPlayerList) {
-            if (item.Server != server) {
-                continue;
-            }
+        TsuguUser.TsuguUserServerInList[] players;
 
-            string base64 = await ctx.Tsugu.Query.SearchPlayer(item.PlayerId, server);
+        if (server == null) {
+            players = ctx.TsuguUser.UserPlayerList;
+        } else {
+            players = (
+                from player in ctx.TsuguUser.UserPlayerList
+                where player.Server == server
+                select player
+            ).ToArray();
+        }
 
-            await ctx.SendImage(base64);
+        if (index >= players.Length) {
+            await ctx.SendPlainText(
+                (server != null ? $"服务器 [{server.Value.ToChineseString()}] " : "")
+                + $"未找到记录 {index}，请先绑定"
+            );
 
             return;
         }
 
-        await ctx.SendPlainText($"服务器 [{server.ToChineseString()}] 未绑定过玩家！");
+        string base64 = await ctx.Tsugu.Query.SearchPlayer(players[0].PlayerId, players[0].Server);
+
+        await ctx.SendImage(base64);
     }
 }

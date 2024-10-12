@@ -18,7 +18,7 @@ public class ParsedArgs {
     /// 批量获取参数（vararg）
     /// </summary>
     /// <param name="r">范围</param>
-    public Element[] this[Range r] {
+    private Element[] this[Range r] {
         get {
             List<Element> elements = [];
 
@@ -33,6 +33,20 @@ public class ParsedArgs {
         }
     }
 
+    public Element[] GetVararg(string key) {
+        int i = 0;
+
+        foreach (string k in _parsedArgs.Keys) {
+            if (k != key) {
+                i++;
+            } else {
+                break;
+            }
+        }
+        
+        return this[i..];
+    }
+
     public ParsedArgs(ArgumentMeta[] metas, List<string> tokens) {
         _parsedArgs = new OrderedDictionary();
 
@@ -41,6 +55,11 @@ public class ParsedArgs {
         List<string> args = tokens.Count <= 1 ? [] : tokens[1..];
 
         ConcatenatedArgs = string.Join(" ", args);
+
+        // nothing to parse
+        if (metas.Length == 0) {
+            return;
+        }
 
         int i = 0;
 

@@ -29,7 +29,7 @@ public class UserEndpoint(TsuguHttpClient client) {
     public async Task ChangeUserData(
         string userId, string platform,
         Server? mainServer = null, Server[]? displayedServerList = null, 
-        bool? shareRoomNumber = null, int? userPlayerIndex = null
+        bool? shareRoomNumber = null, uint? userPlayerIndex = null
     ) {
         Dictionary<string, object> o = new();
 

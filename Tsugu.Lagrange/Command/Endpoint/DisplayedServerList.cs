@@ -15,7 +15,7 @@ public class DisplayedServerList : BaseCommand {
     ];
 
     protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
-        Server[] displayedServerList = args[..]
+        Server[] displayedServerList = args.GetVararg("displayedServerList")
             .Select(e => e.Get<Server>()).ToArray();
 
         await ctx.Tsugu.User.ChangeUserData(

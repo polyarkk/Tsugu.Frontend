@@ -3,7 +3,7 @@
 [AttributeUsage(AttributeTargets.Class)]
 public class ApiCommandAttribute : Attribute {
     /// <summary>
-    /// 指定调用方式
+    /// 调用方式
     /// </summary>
     public required string[] Aliases { get; set; }
 
