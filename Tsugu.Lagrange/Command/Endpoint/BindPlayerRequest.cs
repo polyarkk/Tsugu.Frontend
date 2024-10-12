@@ -1,4 +1,5 @@
-﻿using Tsugu.Api.Enum;
+﻿using Tsugu.Api;
+using Tsugu.Api.Enum;
 using Tsugu.Lagrange.Command.Argument;
 using Tsugu.Lagrange.Util;
 
@@ -16,35 +17,46 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 public class BindPlayerRequest : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
         Argument<uint>("playerId", "玩家ID"),
-        Argument<Server>("server", "服务器").AsOptional(),
+        Argument<Server>("server", "服务器").AsOptional()
+            .WithMatcher(ArgumentMatchers.ToServerEnumMatcher),
     ];
 
     protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
         Server server = args["server"].GetOr(() => ctx.TsuguUser.MainServer);
+        uint playerId = args["playerId"].Get<uint>();
+
+        using BestdoriClient bestdori = new();
+
+        if (!await bestdori.IsValidPlayer(playerId, server)) {
+            await ctx.SendPlainText($"服务器 [{server.ToChineseString()}] 不存在该玩家！");
+
+            return;
+        }
+        
         bool unbind = args.Alias == "解除绑定";
-        bool bound = ctx.TsuguUser.UserPlayerList.Any(player => player.Server == server);
+        bool bound = ctx.TsuguUser.UserPlayerList.Any(player =>
+            player.PlayerId == playerId && player.Server == server
+        );
 
         if (!unbind && bound) {
-            await ctx.SendPlainText($"服务器 [{server.ToLowerString()}] 已绑定过玩家！");
+            await ctx.SendPlainText($"服务器 [{server.ToChineseString()}] 已绑定过该玩家！");
 
             return;
         }
 
         if (unbind && !bound) {
-            await ctx.SendPlainText($"服务器 [{server.ToLowerString()}] 没有绑定过玩家！");
+            await ctx.SendPlainText($"服务器 [{server.ToChineseString()}] 没有绑定过该玩家！");
 
             return;
-            
         }
 
         string userId = ctx.Chain.FriendUin.ToString();
 
         uint verifyCode = await ctx.Tsugu.User.BindPlayerRequest(userId, Constant.Platform);
 
-        // todo check whether player id is valid (bestdori api or something)
         _ = new BindPlayerVerificationTimer(
             ctx.AppSettings.BackendUrl, ctx.Bot, ctx.Chain.GroupUin,
-            ctx.Chain.FriendUin, args["playerId"].Get<uint>(),
+            ctx.Chain.FriendUin, playerId,
             server, unbind
         );
 

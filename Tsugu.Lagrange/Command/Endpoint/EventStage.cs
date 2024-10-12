@@ -18,7 +18,8 @@ public class EventStage : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
         Argument<bool>("meta", "是否显示歌曲Meta").AsOptional(),
         Argument<uint>("eventId", "活动ID").AsOptional(),
-        Argument<Server>("mainServer", "服务器").AsOptional(),
+        Argument<Server>("mainServer", "服务器").AsOptional()
+            .WithMatcher(ArgumentMatchers.ToServerEnumMatcher),
     ];
 
     protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {

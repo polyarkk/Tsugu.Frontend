@@ -15,7 +15,8 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class PlayerStatus : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        Argument<Server>("server", "服务器").AsOptional(),
+        Argument<Server>("server", "服务器").AsOptional()
+            .WithMatcher(ArgumentMatchers.ToServerEnumMatcher),
     ];
 
     protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
@@ -33,6 +34,6 @@ public class PlayerStatus : BaseCommand {
             return;
         }
 
-        await ctx.SendPlainText($"服务器 [{server.ToLowerString()}] 未绑定过玩家！");
+        await ctx.SendPlainText($"服务器 [{server.ToChineseString()}] 未绑定过玩家！");
     }
 }

@@ -15,7 +15,8 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 public class SearchPlayer : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
         Argument<uint>("playerId", "玩家ID"),
-        Argument<Server>("server", "服务器").AsOptional(),
+        Argument<Server>("server", "服务器").AsOptional()
+            .WithMatcher(ArgumentMatchers.ToServerEnumMatcher),
     ];
 
     protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {

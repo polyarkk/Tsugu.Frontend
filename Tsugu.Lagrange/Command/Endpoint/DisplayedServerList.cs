@@ -10,7 +10,8 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class DisplayedServerList : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        Argument<Server>("displayedServerList", "默认服务器"),
+        Argument<Server>("displayedServerList", "若干默认服务器")
+            .WithMatcher(ArgumentMatchers.ToServerEnumMatcher),
     ];
 
     protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
@@ -22,6 +23,6 @@ public class DisplayedServerList : BaseCommand {
             displayedServerList: displayedServerList
         );
 
-        await ctx.SendPlainText($"默认服务器排序已设定为：{string.Join(", ", displayedServerList.Select(e => e.ToLowerString()))}");
+        await ctx.SendPlainText($"默认服务器排序已设定为：{string.Join(", ", displayedServerList.Select(e => e.ToChineseString()))}");
     }
 }

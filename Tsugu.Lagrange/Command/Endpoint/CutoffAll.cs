@@ -15,7 +15,8 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 public class CutoffAll : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
         Argument<uint>("eventId", "活动ID").AsOptional(),
-        Argument<Server>("mainServer", "服务器").AsOptional(),
+        Argument<Server>("mainServer", "服务器").AsOptional()
+            .WithMatcher(ArgumentMatchers.ToServerEnumMatcher),
     ];
 
     protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {

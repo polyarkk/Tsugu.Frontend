@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Tsugu.Api.Misc;
+namespace Tsugu.Api.Util;
 
 public static class ApiUtil {
     private readonly static JsonSerializerOptions JsonConfig = new() {

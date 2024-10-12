@@ -135,9 +135,8 @@ public class BindPlayerVerificationTimer : Timer {
             }
 
             ReplyToUser(reply);
+            Dispose();
         }
-
-        Dispose();
     }
 
     private void ReplyToUser(string text) {

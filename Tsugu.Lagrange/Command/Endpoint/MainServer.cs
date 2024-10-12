@@ -10,7 +10,8 @@ namespace Tsugu.Lagrange.Command.Endpoint;
 )]
 public class MainServer : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
-        Argument<Server>("mainServer", "若干主服务器"),
+        Argument<Server>("mainServer", "主服务器")
+            .WithMatcher(ArgumentMatchers.ToServerEnumMatcher),
     ];
 
     protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
@@ -21,6 +22,6 @@ public class MainServer : BaseCommand {
             mainServer: mainServer
         );
 
-        await ctx.SendPlainText($"主服务器已设定为：{mainServer.ToLowerString()}");
+        await ctx.SendPlainText($"主服务器已设定为：{mainServer.ToChineseString()}");
     }
 }

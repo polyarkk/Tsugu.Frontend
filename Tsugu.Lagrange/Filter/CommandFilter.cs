@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 using System.Text;
+using Tsugu.Api.Enum;
 using Tsugu.Api.Misc;
 using Tsugu.Lagrange.Command;
 using Tsugu.Lagrange.Command.Argument;
@@ -89,7 +90,7 @@ public class CommandFilter : IFilter {
 
         if (string.Equals(tokens[0], "tsugu_help", StringComparison.OrdinalIgnoreCase)) {
             await context.SendPlainText(
-                $"当前主服务器: {context.TsuguUser.MainServer.ToLowerString()}\n{GetHelpPlainText()}"
+                $"当前主服务器: {context.TsuguUser.MainServer.ToChineseString()}\n{GetHelpPlainText()}"
             );
 
             return;

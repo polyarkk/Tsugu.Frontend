@@ -17,15 +17,7 @@ public class SongChart : BaseCommand {
         Argument<uint>("songId", "乐曲ID"),
         Argument<ChartDifficulty>("difficulty", "难度")
             .AsOptional()
-            .WithMatcher(s => s switch {
-                "ez" => ChartDifficulty.Easy,
-                "nm" => ChartDifficulty.Normal,
-                "hd" => ChartDifficulty.Hard,
-                "ex" => ChartDifficulty.Expert,
-                "sp" => ChartDifficulty.Special,
-                null => null,
-                _ => Enum.Parse<ChartDifficulty>(s),
-            }),
+            .WithMatcher(ArgumentMatchers.ToChartDifficultyEnumMatcher),
     ];
 
     protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
