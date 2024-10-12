@@ -37,6 +37,39 @@ public class AppSettings {
     /// </summary>
     public uint[] Admins { get; set; } = [];
 
+    /// <summary>
+    /// Satori 配置
+    /// </summary>
+    public SatoriConfig Satori { get; set; } = new();
+    
+    public class SatoriConfig {
+        /// <summary>
+        /// 是否启用 Satori
+        /// </summary>
+        public bool Enabled { get; set; } = false;
+        
+        /// <summary>
+        /// Koishi 中将 server-satori 的 path 配置修改为 "/"
+        /// </summary>
+        public string Server { get; set; } = "http://127.0.0.1:5140/";
+
+        /// <summary>
+        /// 若服务端无需 Token 则填入 null
+        /// </summary>
+        public string? Token { get; set; } = null;
+
+        /// <summary>
+        /// 服务端中需要接管的 Bot
+        /// </summary>
+        public BotConfig[] Bots { get; set; } = [];
+
+        public class BotConfig {
+            public string Platform { get; set; } = "";
+
+            public string SelfId { get; set; } = "";
+        }
+    }
+
     public bool IsGroupWhitelisted(uint? groupUin) {
         // 忽略私聊情况
         if (groupUin == null) {

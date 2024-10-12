@@ -29,8 +29,8 @@ if (!File.Exists("appsettings.json")) {
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddHostedService<TsuguHostedService>();
-builder.Services.AddScoped<BindPlayerVerificationTimer>();
+builder.Services.AddHostedService<LagrangeHostedService>();
+// builder.Services.AddHostedService<SatoriHostedService>();
 
 builder.Configuration.AddJsonFile("appsettings.json");
 

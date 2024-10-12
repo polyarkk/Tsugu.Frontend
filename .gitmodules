@@ -1,0 +1,3 @@
+[submodule "Satori.NET"]
+	path = Satori.NET
+	url = https://github.com/polyarkk/Satori.NET

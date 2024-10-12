@@ -14,10 +14,10 @@ using Tsugu.Lagrange.Filter;
 
 namespace Tsugu.Lagrange;
 
-internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
+internal class LagrangeHostedService : IHostedService, IDisposable {
     private readonly BotContext _botContext;
 
-    private readonly ILogger _logger;
+    private readonly ILogger<LagrangeHostedService> _logger;
 
     private readonly Timer _gcTimer;
 
@@ -27,7 +27,7 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
 
     private bool _needQrCodeLogin;
 
-    public TsuguHostedService(ILogger<TsuguHostedService> logger, IConfiguration configuration) {
+    public LagrangeHostedService(ILogger<LagrangeHostedService> logger, IConfiguration configuration) {
         _logger = logger;
         _logger.LogInformation("--- TSUGU FRONTEND IS NOW STARTING!!! ---");
         _filters = [];
@@ -71,29 +71,14 @@ internal class TsuguHostedService : IHostedLifecycleService, IDisposable {
 
     public void Dispose() {
         _botContext.Dispose();
+        _gcTimer.Dispose();
     }
 
     public async Task StartAsync(CancellationToken cancellationToken) {
         await Login();
     }
 
-    public async Task StopAsync(CancellationToken cancellationToken) {
-        await _gcTimer.DisposeAsync();
-    }
-
-    public Task StartingAsync(CancellationToken cancellationToken) {
-        return Task.CompletedTask;
-    }
-
-    public Task StartedAsync(CancellationToken cancellationToken) {
-        return Task.CompletedTask;
-    }
-
-    public Task StoppingAsync(CancellationToken cancellationToken) {
-        return Task.CompletedTask;
-    }
-
-    public Task StoppedAsync(CancellationToken cancellationToken) {
+    public Task StopAsync(CancellationToken cancellationToken) {
         return Task.CompletedTask;
     }
 

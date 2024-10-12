@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Satori.NET\src\Satori.Client\Satori.Client.csproj" />
     <ProjectReference Include="..\Tsugu.Api\Tsugu.Api.csproj" />
   </ItemGroup>
 

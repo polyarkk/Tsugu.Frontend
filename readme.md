@@ -1,4 +1,11 @@
-﻿### 项目结构：
+﻿```shell
+git clone --recurse-submodules https://github.com/polyarkk/Tsugu.Lagrange
+```
+### TODO
+
+- [ ] Satori 支持
+
+### 项目结构：
 
 - `Tsugu.Api`: 后端 API 调用类库
 - `Tsugu.Lagrange`: 机器人前端
