@@ -70,7 +70,7 @@ public class AppSettings {
         }
     }
 
-    public bool IsGroupWhitelisted(string protocol, string platform, string? groupId) {
+    public bool IsGroupAllowed(string protocol, string platform, string? groupId) {
         // 忽略私聊情况
         if (groupId == null) {
             return true;
@@ -81,7 +81,7 @@ public class AppSettings {
         return Whitelisted ? whitelisted : !whitelisted;
     }
 
-    public bool IsFriendWhitelisted(string userIdentifier) {
+    public bool IsFriendAllowed(string userIdentifier) {
         bool whitelisted = Friends.Contains(userIdentifier);
 
         return Whitelisted ? whitelisted : !whitelisted;

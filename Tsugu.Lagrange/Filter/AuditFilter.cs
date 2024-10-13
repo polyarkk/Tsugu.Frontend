@@ -13,12 +13,14 @@ public class AuditFilter : IFilter {
 
     public Task DoFilterAsync(IMessageContext messageContext) {
         StringBuilder sb = new();
+        
+        sb.AppendLine($"platform       : {messageContext.Protocol}:{messageContext.Platform}");
 
         if (messageContext.MessageSource == MessageSource.Group) {
-            sb.AppendLine($"group          : {messageContext.GroupId}");
+            sb.AppendLine($"group          : {messageContext.GroupName}({messageContext.GroupId})");
         }
 
-        sb.AppendLine($"user           : {messageContext.FriendId}({messageContext.FriendId})");
+        sb.AppendLine($"user           : {messageContext.FriendName}({messageContext.FriendId})");
         sb.Append($"preview text   : {messageContext.StringifiedContent}");
 
         Logger.LogInformation("{msg}", sb.ToString());

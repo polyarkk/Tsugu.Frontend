@@ -37,9 +37,9 @@ public class CommandFilter : IFilter {
 
     public async Task DoFilterAsync(IMessageContext messageContext) {
         if ((messageContext.MessageSource == MessageSource.Friend &&
-                !_appSettings.IsFriendWhitelisted(messageContext.UserIdentifier)
+                !_appSettings.IsFriendAllowed(messageContext.UserIdentifier)
             ) || (messageContext.MessageSource == MessageSource.Group &&
-                !_appSettings.IsGroupWhitelisted(messageContext.Protocol, messageContext.Platform,
+                !_appSettings.IsGroupAllowed(messageContext.Protocol, messageContext.Platform,
                     messageContext.GroupId
                 )
             )

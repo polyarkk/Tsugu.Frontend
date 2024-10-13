@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Tsugu.Lagrange.Context;
+using Tsugu.Lagrange.Filter;
 
-namespace Tsugu.Lagrange.Filter;
+namespace Tsugu.Lagrange.Service;
 
 public class FilterService {
     private readonly ILogger<FilterService> _logger;

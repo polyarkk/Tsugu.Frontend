@@ -4,10 +4,9 @@ using Microsoft.Extensions.Logging;
 using Satori.Client;
 using Satori.Protocol.Events;
 using Tsugu.Lagrange.Context;
-using Tsugu.Lagrange.Filter;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
-namespace Tsugu.Lagrange;
+namespace Tsugu.Lagrange.Service;
 
 internal class SatoriHostedService : IHostedService, IDisposable {
     private readonly SatoriClient _client;

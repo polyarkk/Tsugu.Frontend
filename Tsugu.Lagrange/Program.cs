@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using Tsugu.Lagrange.Command;
 using Tsugu.Lagrange.Filter;
+using Tsugu.Lagrange.Service;
 using Tsugu.Lagrange.Util;
 
 if (!File.Exists("appsettings.json")) {

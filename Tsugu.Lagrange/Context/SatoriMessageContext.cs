@@ -10,12 +10,17 @@ namespace Tsugu.Lagrange.Context;
 public class SatoriMessageContext : IMessageContext {
     private readonly SatoriBot _satoriBot;
 
+    private readonly string _userId;
+
     public SatoriMessageContext(SatoriBot satoriBot, Event e) {
         _satoriBot = satoriBot;
 
         Platform = e.Platform;
-        FriendId = e.User?.Id!;
-        GroupId = e.Channel?.Id;
+        _userId = e.User?.Id!;
+        FriendId = e.Channel?.Id!;
+        FriendName = e.User?.Name ?? _userId;
+        GroupId = e.Guild?.Id;
+        GroupName = e.Guild?.Name ?? e.Channel?.Name ?? GroupId;
         StringifiedContent = e.Message?.Content ?? "";
         MessageSource = e.Channel?.Type == ChannelType.Text ? MessageSource.Friend : MessageSource.Group;
 
@@ -40,9 +45,13 @@ public class SatoriMessageContext : IMessageContext {
 
     public string Platform { get; }
 
+    public string FriendName { get; }
+
+    // 实际为频道ID
     public string FriendId { get; }
 
-    // 无论私聊还是群发该字段都不为 null，私聊会话也被视为频道
+    public string? GroupName { get; }
+
     public string? GroupId { get; }
     
     public bool MentionedMe { get; }
@@ -54,11 +63,11 @@ public class SatoriMessageContext : IMessageContext {
     public MessageSource MessageSource { get; }
 
     public async Task ReplyPlainText(string text) {
-        await _satoriBot.CreateMessageAsync(GroupId!, GetDefaultElement(new TextElement { Text = text }));
+        await _satoriBot.CreateMessageAsync(FriendId, GetDefaultElement(new TextElement { Text = text }));
     }
 
     public async Task ReplyImage(params string[] base64List) {
-        await _satoriBot.CreateMessageAsync(GroupId!,
+        await _satoriBot.CreateMessageAsync(FriendId,
             GetDefaultElement(
                 (
                     from b in base64List
@@ -87,7 +96,7 @@ public class SatoriMessageContext : IMessageContext {
         List<Element> e = [];
 
         if (MessageSource == MessageSource.Group) {
-            e.Add(new AtElement { Id = FriendId });
+            e.Add(new AtElement { Id = _userId });
         }
 
         e.AddAll(elements);

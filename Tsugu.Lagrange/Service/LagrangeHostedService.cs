@@ -11,9 +11,8 @@ using QRCoder;
 using System.Text.Json;
 using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Enum;
-using Tsugu.Lagrange.Filter;
 
-namespace Tsugu.Lagrange;
+namespace Tsugu.Lagrange.Service;
 
 internal class LagrangeHostedService : IHostedService, IDisposable {
     private readonly BotContext _botContext;

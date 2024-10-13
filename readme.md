@@ -4,6 +4,7 @@ git clone --recurse-submodules https://github.com/polyarkk/Tsugu.Lagrange
 ### TODO
 
 - [x] Satori 支持
+- [ ] 聊天输出美化（Satori）
 
 ### 项目结构：
 

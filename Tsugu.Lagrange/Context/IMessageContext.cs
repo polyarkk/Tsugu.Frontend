@@ -9,7 +9,11 @@ public interface IMessageContext {
     
     string Platform { get; }
     
+    string FriendName { get; }
+    
     string FriendId { get; }
+    
+    string? GroupName { get; }
     
     string? GroupId { get; }
     
