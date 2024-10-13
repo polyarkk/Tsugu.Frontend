@@ -1,4 +1,5 @@
 ﻿using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -16,13 +17,13 @@ public class SearchCharacter : BaseCommand {
         Argument<string>("keywords", "关键词"),
     ];
 
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SearchCharacter(
             ctx.TsuguUser.DisplayedServerList,
             args.ConcatenatedArgs,
             ctx.AppSettings.Compress
         );
 
-        await ctx.SendImage(base64);
+        await ctx.ReplyImage(base64);
     }
 }

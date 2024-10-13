@@ -1,4 +1,5 @@
 ﻿using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -8,13 +9,13 @@ namespace Tsugu.Lagrange.Command.Endpoint;
     Description = "查询歌曲分数排行表"
 )]
 public class SongMeta : BaseCommand {
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SongMeta(
             ctx.TsuguUser.DisplayedServerList,
             ctx.TsuguUser.MainServer,
             ctx.AppSettings.Compress
         );
 
-        await ctx.SendImage(base64);
+        await ctx.ReplyImage(base64);
     }
 }

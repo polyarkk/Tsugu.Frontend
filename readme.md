@@ -3,7 +3,7 @@ git clone --recurse-submodules https://github.com/polyarkk/Tsugu.Lagrange
 ```
 ### TODO
 
-- [ ] Satori 支持
+- [x] Satori 支持
 
 ### 项目结构：
 

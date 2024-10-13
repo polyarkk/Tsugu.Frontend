@@ -47,12 +47,12 @@ public class ParsedArgs {
         return this[i..];
     }
 
-    public ParsedArgs(ArgumentMeta[] metas, List<string> tokens) {
+    public ParsedArgs(ArgumentMeta[] metas, IReadOnlyList<string> tokens) {
         _parsedArgs = new OrderedDictionary();
 
         Alias = tokens[0];
 
-        List<string> args = tokens.Count <= 1 ? [] : tokens[1..];
+        List<string> args = tokens.Count <= 1 ? [] : tokens.Skip(1).ToList();
 
         ConcatenatedArgs = string.Join(" ", args);
 
@@ -88,7 +88,7 @@ public class ParsedArgs {
             _parsedArgs[$"{meta.Key}{(orphanIndex != null ? $"_orphan_{orphanIndex}" : "")}"] = meta.InvokeMatcher(arg);
         } catch (Exception) {
             if (meta.Type.IsEnum) {
-                string candidates = string.Join("|", Enum.GetNames(meta.Type).Select(n => n.ToLower()));
+                string candidates = string.Join("|", System.Enum.GetNames(meta.Type).Select(n => n.ToLower()));
 
                 throw new ArgumentParseException($"参数 [{meta.Name}] 非法，需要 {meta.Type.Name}！({candidates})");
             }

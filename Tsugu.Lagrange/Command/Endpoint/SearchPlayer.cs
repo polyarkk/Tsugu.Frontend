@@ -1,5 +1,6 @@
 ﻿using Tsugu.Api.Enum;
 using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -19,7 +20,7 @@ public class SearchPlayer : BaseCommand {
             .WithMatcher(ArgumentMatchers.ToServerEnumMatcher),
     ];
 
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SearchPlayer(
             args["playerId"].Get<uint>(),
             args["server"].GetOr(() => ctx.TsuguUser.MainServer),
@@ -27,6 +28,6 @@ public class SearchPlayer : BaseCommand {
             ctx.AppSettings.Compress
         );
 
-        await ctx.SendImage(base64);
+        await ctx.ReplyImage(base64);
     }
 }

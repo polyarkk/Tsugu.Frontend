@@ -1,6 +1,7 @@
 ﻿using Lagrange.Core.Common.Interface.Api;
 using Lagrange.Core.Message;
 using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -14,15 +15,9 @@ public class GetCardIllustration : BaseCommand {
         Argument<uint>("cardId", "卡面ID"),
     ];
 
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         string[] base64List = await ctx.Tsugu.Query.GetCardIllustration(args["cardId"].Get<uint>());
 
-        MessageBuilder messageBuilder = MessageUtil.GetDefaultMessageBuilder(ctx);
-
-        foreach (string base64 in base64List) {
-            messageBuilder.Image(Convert.FromBase64String(base64));
-        }
-
-        await ctx.Bot.SendMessage(messageBuilder.Build());
+        await ctx.ReplyImage(base64List);
     }
 }

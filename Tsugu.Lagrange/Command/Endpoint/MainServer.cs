@@ -1,5 +1,6 @@
 ﻿using Tsugu.Api.Enum;
 using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -14,14 +15,14 @@ public class MainServer : BaseCommand {
             .WithMatcher(ArgumentMatchers.ToServerEnumMatcher),
     ];
 
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         Server mainServer = args["mainServer"].Get<Server>();
 
         await ctx.Tsugu.User.ChangeUserData(
-            ctx.TsuguUser.UserId, Constant.Platform,
+            ctx.TsuguUser.UserId, ctx.MessageContext.Platform,
             mainServer: mainServer
         );
 
-        await ctx.SendPlainText($"主服务器已设定为：{mainServer.ToChineseString()}");
+        await ctx.ReplyPlainText($"主服务器已设定为：{mainServer.ToChineseString()}");
     }
 }

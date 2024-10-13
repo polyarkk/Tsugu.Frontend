@@ -2,11 +2,10 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Satori.Client;
-using Satori.Protocol.Elements;
 using Satori.Protocol.Events;
-using Tsugu.Lagrange.Util;
+using Tsugu.Lagrange.Context;
+using Tsugu.Lagrange.Filter;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
-using SatoriLogLevel = Satori.Client.LogLevel;
 
 namespace Tsugu.Lagrange;
 
@@ -17,15 +16,23 @@ internal class SatoriHostedService : IHostedService, IDisposable {
 
     private readonly ILogger<SatoriHostedService> _logger;
 
-    public SatoriHostedService(ILogger<SatoriHostedService> logger, IConfiguration configuration) {
+    private readonly FilterService _filterService;
+
+    public SatoriHostedService(
+        ILogger<SatoriHostedService> logger, IConfiguration configuration, FilterService filterService
+    ) {
         _logger = logger;
+        
+        _logger.LogInformation("--- TSUGU SATORI FRONTEND IS NOW STARTING!!! ---");
+        
         _bots = [];
-        
+        _filterService = filterService;
+
         AppSettings appSettings = configuration.GetSection("Tsugu").Get<AppSettings>()!;
-        
+
         if (!appSettings.Satori.Enabled) {
             _client = null!;
-            
+
             return;
         }
 
@@ -37,24 +44,20 @@ internal class SatoriHostedService : IHostedService, IDisposable {
 
         foreach (AppSettings.SatoriConfig.BotConfig botConfig in appSettings.Satori.Bots) {
             SatoriBot bot = _client.Bot(botConfig.Platform, botConfig.SelfId);
-            
+
             bot.MessageCreated += OnMessageCreated;
 
-            string key = string.Concat(botConfig.Platform, ":", botConfig.SelfId);
-            
+            string key = GetBotKey(botConfig.Platform, botConfig.SelfId);
+
             _bots.Add(key, bot);
-            
+
             _logger.LogInformation("Registered bot: {key}", key);
         }
     }
 
     private async void OnMessageCreated(object? sender, Event e) {
-        // todo message content broken for sandbox?
-        _logger.LogInformation("Received message from {e.Channel!.Id}: {e.Message!.Content}", e.Channel!.Id, e.Message!.Content);
-        
-        await _bots[GetBotKey(e.Platform, e.SelfId)].CreateMessageAsync(e.Channel.Id,
-            new TextElement { Text = "非常好 Satori，爱来自 Satori.Client" }
-        );
+        // koishi sandbox will not work here
+        await _filterService.InvokeFilters(new SatoriMessageContext(_bots[GetBotKey(e.Platform, e.SelfId)], e));
     }
 
     private static string GetBotKey(string platform, string selfId) {

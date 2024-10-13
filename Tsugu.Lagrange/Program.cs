@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using Tsugu.Lagrange.Command;
+using Tsugu.Lagrange.Filter;
 using Tsugu.Lagrange.Util;
 
 if (!File.Exists("appsettings.json")) {
@@ -29,8 +30,9 @@ if (!File.Exists("appsettings.json")) {
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
+builder.Services.AddScoped<FilterService>();
 builder.Services.AddHostedService<LagrangeHostedService>();
-// builder.Services.AddHostedService<SatoriHostedService>();
+builder.Services.AddHostedService<SatoriHostedService>();
 
 builder.Configuration.AddJsonFile("appsettings.json");
 

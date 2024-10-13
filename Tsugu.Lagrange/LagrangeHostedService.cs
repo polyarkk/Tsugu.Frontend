@@ -5,11 +5,12 @@ using Lagrange.Core.Common.Interface.Api;
 using Lagrange.Core.Event;
 using Lagrange.Core.Event.EventArg;
 using Lagrange.Core.Message;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using QRCoder;
 using System.Text.Json;
+using Tsugu.Lagrange.Context;
+using Tsugu.Lagrange.Enum;
 using Tsugu.Lagrange.Filter;
 
 namespace Tsugu.Lagrange;
@@ -21,16 +22,16 @@ internal class LagrangeHostedService : IHostedService, IDisposable {
 
     private readonly Timer _gcTimer;
 
-    private readonly List<IFilter> _filters;
+    private readonly FilterService _filterService;
 
     private BotKeystore _keyStore;
 
     private bool _needQrCodeLogin;
 
-    public LagrangeHostedService(ILogger<LagrangeHostedService> logger, IConfiguration configuration) {
+    public LagrangeHostedService(ILogger<LagrangeHostedService> logger, FilterService filterService) {
         _logger = logger;
-        _logger.LogInformation("--- TSUGU FRONTEND IS NOW STARTING!!! ---");
-        _filters = [];
+        _logger.LogInformation("--- TSUGU LAGRANGE FRONTEND IS NOW STARTING!!! ---");
+        _filterService = filterService;
         _gcTimer = new Timer(_ => GC.Collect(), null, TimeSpan.FromMinutes(30), TimeSpan.FromMinutes(30));
         
         BotDeviceInfo deviceInfo;
@@ -60,13 +61,6 @@ internal class LagrangeHostedService : IHostedService, IDisposable {
         }
 
         _botContext = BotFactory.Create(new BotConfig(), deviceInfo, _keyStore);
-
-        RegisterFilter(new AuditFilter());
-        RegisterFilter(new CommandFilter(configuration));
-    }
-
-    private void RegisterFilter(IFilter filter) {
-        _filters.Add(filter);
     }
 
     public void Dispose() {
@@ -156,14 +150,14 @@ internal class LagrangeHostedService : IHostedService, IDisposable {
     private async void OnMessageReceived<TMessageEvent>(BotContext ctx, TMessageEvent e)
     where TMessageEvent : EventBase {
         MessageChain chain;
-        MessageType type;
+        MessageSource source;
 
         if (e is FriendMessageEvent fe) {
             chain = fe.Chain;
-            type = MessageType.Friend;
+            source = MessageSource.Friend;
         } else if (e is GroupMessageEvent ge) {
             chain = ge.Chain;
-            type = MessageType.Group;
+            source = MessageSource.Group;
         } else {
             return;
         }
@@ -177,12 +171,6 @@ internal class LagrangeHostedService : IHostedService, IDisposable {
             return;
         }
 
-        foreach (IFilter filter in _filters) {
-            try {
-                await filter.DoFilterAsync(ctx, chain, type);
-            } catch (Exception ex) {
-                _logger.LogError("exception raised upon handling filter [{filter}]!\n{e}", filter.GetType().Name, ex.ToString());
-            }
-        }
+        await _filterService.InvokeFilters(new LagrangeMessageContext(ctx, chain, source));
     }
 }

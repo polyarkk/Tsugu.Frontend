@@ -2,6 +2,7 @@
 using Tsugu.Api.Entity;
 using Tsugu.Api.Enum;
 using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -19,9 +20,9 @@ public class MainPlayer : BaseCommand {
         Argument<uint>("index", "编号").AsOptional(),
     ];
 
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         if (ctx.TsuguUser.UserPlayerList.Length == 0) {
-            await ctx.SendPlainText($"未绑定任何账号，请先绑定");
+            await ctx.ReplyPlainText($"未绑定任何账号，请先绑定");
 
             return;
         }
@@ -30,16 +31,16 @@ public class MainPlayer : BaseCommand {
 
         if (index != null) {
             if ((int)index - 1 >= ctx.TsuguUser.UserPlayerList.Length || (int)index - 1 < 0) {
-                await ctx.SendPlainText($"未找到记录 {index}，请先绑定");
+                await ctx.ReplyPlainText($"未找到记录 {index}，请先绑定");
 
                 return;
             }
 
-            await ctx.Tsugu.User.ChangeUserData(ctx.Chain.FriendUin.ToString(), Constant.Platform,
+            await ctx.Tsugu.User.ChangeUserData(ctx.MessageContext.FriendId, ctx.MessageContext.Platform,
                 userPlayerIndex: index - 1
             );
 
-            await ctx.SendPlainText($"已将玩家 #{index} 设置为主账号");
+            await ctx.ReplyPlainText($"已将玩家 #{index} 设置为主账号");
 
             return;
         }
@@ -54,7 +55,7 @@ public class MainPlayer : BaseCommand {
 
         sb.Append("\n例如：主账号 1");
 
-        await ctx.SendPlainText(sb.ToString());
+        await ctx.ReplyPlainText(sb.ToString());
     }
 
     private static string MaskPlayerId(uint playerId) {

@@ -13,7 +13,7 @@ public static class ArgumentMatchers {
             "简中服" => Server.Cn,
             "韩服" => Server.Kr,
             null => null,
-            _ => Enum.Parse<Server>(str, true),
+            _ => System.Enum.Parse<Server>(str, true),
         };
     }
 
@@ -25,7 +25,7 @@ public static class ArgumentMatchers {
             "ex" => ChartDifficulty.Expert,
             "sp" => ChartDifficulty.Special,
             null => null,
-            _ => Enum.Parse<ChartDifficulty>(str, true),
+            _ => System.Enum.Parse<ChartDifficulty>(str, true),
         };
     }
 }

@@ -13,14 +13,14 @@ public class AppSettings {
     public bool Whitelisted { get; set; } = true;
 
     /// <summary>
-    /// 白/黑名单群
+    /// 白/黑名单QQ群/服务器，格式：协议名:平台名:服务器ID，对于 Lagrange 协议，平台只能为 red
     /// </summary>
-    public uint[] Groups { get; set; } = [];
-
+    public string[] Groups { get; set; } = [];
+    
     /// <summary>
-    /// 白/黑名单私聊用户
+    /// 白/黑名单私聊用户，格式：协议名:平台名:用户ID，对于 Lagrange 协议，平台只能为 red
     /// </summary>
-    public uint[] Friends { get; set; } = [];
+    public string[] Friends { get; set; } = [];
 
     /// <summary>
     /// 默认返回时压缩图片
@@ -33,9 +33,9 @@ public class AppSettings {
     public bool NeedMentioned { get; set; }
 
     /// <summary>
-    /// 机器人管理员
+    /// 机器人管理员，格式：协议名:平台名:用户ID，对于 Lagrange 协议，平台只能为 red
     /// </summary>
-    public uint[] Admins { get; set; } = [];
+    public string[] Admins { get; set; } = [];
 
     /// <summary>
     /// Satori 配置
@@ -70,19 +70,19 @@ public class AppSettings {
         }
     }
 
-    public bool IsGroupWhitelisted(uint? groupUin) {
+    public bool IsGroupWhitelisted(string protocol, string platform, string? groupId) {
         // 忽略私聊情况
-        if (groupUin == null) {
+        if (groupId == null) {
             return true;
         }
 
-        bool whitelisted = Groups.Contains((uint)groupUin);
+        bool whitelisted = Groups.Contains($"{protocol}:{platform}:{groupId}");
 
         return Whitelisted ? whitelisted : !whitelisted;
     }
 
-    public bool IsFriendWhitelisted(uint friendUin) {
-        bool whitelisted = Friends.Contains(friendUin);
+    public bool IsFriendWhitelisted(string userIdentifier) {
+        bool whitelisted = Friends.Contains(userIdentifier);
 
         return Whitelisted ? whitelisted : !whitelisted;
     }

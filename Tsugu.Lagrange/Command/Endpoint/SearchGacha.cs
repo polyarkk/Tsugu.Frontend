@@ -1,4 +1,5 @@
 ﻿using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -13,7 +14,7 @@ public class SearchGacha : BaseCommand {
         Argument<uint>("gachaId", "卡池ID"),
     ];
 
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SearchGacha(
             ctx.TsuguUser.DisplayedServerList,
             args["gachaId"].Get<uint>(),
@@ -21,6 +22,6 @@ public class SearchGacha : BaseCommand {
             ctx.AppSettings.Compress
         );
 
-        await ctx.SendImage(base64);
+        await ctx.ReplyImage(base64);
     }
 }

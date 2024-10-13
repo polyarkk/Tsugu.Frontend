@@ -9,6 +9,8 @@ using Tsugu.Api.Enum;
 using Tsugu.Api.Misc;
 using Tsugu.Lagrange.Command;
 using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
+using Tsugu.Lagrange.Enum;
 using Tsugu.Lagrange.Util;
 using BindingFlags = System.Reflection.BindingFlags;
 
@@ -33,88 +35,91 @@ public class CommandFilter : IFilter {
         LoadEndpoints();
     }
 
-    public async Task DoFilterAsync(BotContext botContext, MessageChain messageChain, MessageType messageType) {
-        if ((messageType == MessageType.Friend && !_appSettings.IsFriendWhitelisted(messageChain.FriendUin))
-            || (messageType == MessageType.Group && !_appSettings.IsGroupWhitelisted(messageChain.GroupUin))
+    public async Task DoFilterAsync(IMessageContext messageContext) {
+        if ((messageContext.MessageSource == MessageSource.Friend &&
+                !_appSettings.IsFriendWhitelisted(messageContext.UserIdentifier)
+            ) || (messageContext.MessageSource == MessageSource.Group &&
+                !_appSettings.IsGroupWhitelisted(messageContext.Protocol, messageContext.Platform,
+                    messageContext.GroupId
+                )
+            )
         ) {
-            Logger.LogInformation("message from [{uin}] won't handle because friend or group is not whitelisted",
-                messageChain.FriendUin
+            Logger.LogInformation("message from [{uid}] won't handle because friend or group is not whitelisted",
+                messageContext.UserIdentifier
             );
 
             return;
         }
 
-        if (messageType == MessageType.Group
-            && _appSettings.NeedMentioned && !messageChain.OfType<MentionEntity>().Any()
+        if (messageContext.MessageSource == MessageSource.Group
+            && _appSettings.NeedMentioned && !messageContext.MentionedMe
         ) {
-            Logger.LogInformation("message from [{uin}] won't handle because it did not mention bot",
-                messageChain.FriendUin
+            Logger.LogInformation("message from [{uid}] won't handle because it did not mention bot",
+                messageContext.UserIdentifier
             );
 
             return;
         }
 
-        List<string> tokens = [];
+        using TsuguContext tsuguContext = new(_appSettings, messageContext);
 
-        foreach (TextEntity entity in messageChain.OfType<TextEntity>()) {
-            tokens.AddAll(entity.ToPreviewText().Split(" "));
-        }
-
-        tokens.RemoveAll(string.IsNullOrWhiteSpace);
-
-        if (tokens.Count == 0) {
+        if (tsuguContext.MessageContext.TextOnlyTokens.Count == 0) {
             return;
         }
 
-        using Context context = new(_appSettings, botContext, messageType, messageChain);
+        bool isAdmin = _appSettings.Admins.Contains(messageContext.UserIdentifier);
 
-        bool isAdmin = _appSettings.Admins.Contains(messageChain.FriendUin);
-
-        if (isAdmin && string.Equals(tokens[0], "tsugu_reload_appsettings", StringComparison.OrdinalIgnoreCase)) {
+        if (isAdmin && string.Equals(tsuguContext.MessageContext.TextOnlyTokens[0], "tsugu_reload_appsettings",
+            StringComparison.OrdinalIgnoreCase
+        )) {
             _appSettings = _configuration.GetSection("Tsugu").Get<AppSettings>()!;
-                
-            await context.SendPlainText("已重新加载配置信息");
+
+            await tsuguContext.ReplyPlainText("已重新加载配置信息");
 
             return;
         }
 
 #if DEBUG
-        if (isAdmin && string.Equals(tokens[0], "tsugu_reload_commands", StringComparison.OrdinalIgnoreCase)) {
+        if (isAdmin && string.Equals(tsuguContext.MessageContext.TextOnlyTokens[0], "tsugu_reload_commands",
+            StringComparison.OrdinalIgnoreCase
+        )) {
             LoadEndpoints();
 
-            await context.SendPlainText("已重新加载指令集\n" + GetHelpPlainText());
+            await tsuguContext.ReplyPlainText("已重新加载指令集\n" + GetHelpPlainText());
 
             return;
         }
 #endif
 
-        if (string.Equals(tokens[0], "tsugu_help", StringComparison.OrdinalIgnoreCase)) {
-            await context.SendPlainText(
-                $"当前主服务器: {context.TsuguUser.MainServer.ToChineseString()}\n{GetHelpPlainText()}"
+        if (string.Equals(tsuguContext.MessageContext.TextOnlyTokens[0], "tsugu_help",
+            StringComparison.OrdinalIgnoreCase
+        )) {
+            await tsuguContext.ReplyPlainText(
+                $"当前主服务器: {tsuguContext.TsuguUser.MainServer.ToChineseString()}\n{GetHelpPlainText()}"
             );
 
             return;
         }
 
-        if (!_commands.TryGetValue(tokens[0], out BaseCommand? api)) {
+        if (!_commands.TryGetValue(tsuguContext.MessageContext.TextOnlyTokens[0], out BaseCommand? api)) {
             return;
         }
 
-        if (tokens.Contains("--help")) {
-            await context.SendPlainText(api.GetHelpText());
+        if (tsuguContext.MessageContext.TextOnlyTokens.Contains("--help")) {
+            await tsuguContext.ReplyPlainText(api.GetHelpText());
 
             return;
         }
 
         try {
-            await api.Invoke(context, tokens);
+            await api.Invoke(tsuguContext, tsuguContext.MessageContext.TextOnlyTokens);
         } catch (ArgumentParseException e) {
-            await context.SendPlainText(api.GetErrorAndHelpText(e.Message));
+            await tsuguContext.ReplyPlainText(api.GetErrorAndHelpText(e.Message));
         } catch (EndpointCallException e) {
-            await context.SendPlainText(e.Message);
+            await tsuguContext.ReplyPlainText(e.Message);
         } catch (Exception e) {
             Logger.LogError("exception raised upon resolving command!\n{e}", e.ToString());
-            await context.SendPlainText($"后台异常！Endpoint: {api.GetType().Name}");
+            await tsuguContext.ReplyPlainText($"后台异常！Endpoint: {api.GetType().Name}");
         }
     }
 

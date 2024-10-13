@@ -1,5 +1,6 @@
 ﻿using Tsugu.Api.Enum;
 using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -20,7 +21,7 @@ public class SongChart : BaseCommand {
             .WithMatcher(ArgumentMatchers.ToChartDifficultyEnumMatcher),
     ];
 
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SongChart(
             ctx.TsuguUser.DisplayedServerList,
             args["songId"].Get<uint>(),
@@ -28,6 +29,6 @@ public class SongChart : BaseCommand {
             ctx.AppSettings.Compress
         );
 
-        await ctx.SendImage(base64);
+        await ctx.ReplyImage(base64);
     }
 }

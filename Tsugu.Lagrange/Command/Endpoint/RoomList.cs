@@ -1,5 +1,6 @@
 ﻿using Tsugu.Api.Entity;
 using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -9,11 +10,11 @@ namespace Tsugu.Lagrange.Command.Endpoint;
     Description = "获取车站信息"
 )]
 public class RoomList : BaseCommand {
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         Room[] rooms = await ctx.Tsugu.Station.QueryAllRoom();
 
         string base64 = await ctx.Tsugu.Query.RoomList(rooms);
 
-        await ctx.SendImage(base64);
+        await ctx.ReplyImage(base64);
     }
 }

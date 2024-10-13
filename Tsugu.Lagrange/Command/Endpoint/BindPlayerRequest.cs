@@ -1,6 +1,7 @@
 ﻿using Tsugu.Api;
 using Tsugu.Api.Enum;
 using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -21,14 +22,14 @@ public class BindPlayerRequest : BaseCommand {
             .WithMatcher(ArgumentMatchers.ToServerEnumMatcher),
     ];
 
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         Server server = args["server"].GetOr(() => ctx.TsuguUser.MainServer);
         uint playerId = args["playerId"].Get<uint>();
 
         using BestdoriClient bestdori = new();
 
         if (!await bestdori.IsValidPlayer(playerId, server)) {
-            await ctx.SendPlainText($"服务器 [{server.ToChineseString()}] 不存在该玩家！");
+            await ctx.ReplyPlainText($"服务器 [{server.ToChineseString()}] 不存在该玩家！");
 
             return;
         }
@@ -39,28 +40,26 @@ public class BindPlayerRequest : BaseCommand {
         );
 
         if (!unbind && bound) {
-            await ctx.SendPlainText($"服务器 [{server.ToChineseString()}] 已绑定过该玩家！");
+            await ctx.ReplyPlainText($"服务器 [{server.ToChineseString()}] 已绑定过该玩家！");
 
             return;
         }
 
         if (unbind && !bound) {
-            await ctx.SendPlainText($"服务器 [{server.ToChineseString()}] 没有绑定过该玩家！");
+            await ctx.ReplyPlainText($"服务器 [{server.ToChineseString()}] 没有绑定过该玩家！");
 
             return;
         }
 
-        string userId = ctx.Chain.FriendUin.ToString();
+        string userId = ctx.MessageContext.FriendId;
 
-        uint verifyCode = await ctx.Tsugu.User.BindPlayerRequest(userId, Constant.Platform);
+        uint verifyCode = await ctx.Tsugu.User.BindPlayerRequest(userId, ctx.MessageContext.Platform);
 
         _ = new BindPlayerVerificationTimer(
-            ctx.AppSettings.BackendUrl, ctx.Bot, ctx.Chain.GroupUin,
-            ctx.Chain.FriendUin, playerId,
-            server, unbind
+            ctx.AppSettings.BackendUrl, ctx.MessageContext, playerId, server, unbind
         );
 
-        await ctx.SendPlainText(
+        await ctx.ReplyPlainText(
             $"""
              已进入{(unbind ? "解除绑定" : "绑定")}流程，请在 1.5 分钟内将游戏账号的 *个性签名* 或者 *当前使用的乐队编队名称* 改为
              {verifyCode}

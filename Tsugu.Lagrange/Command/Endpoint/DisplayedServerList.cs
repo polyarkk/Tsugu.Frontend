@@ -1,5 +1,6 @@
 ﻿using Tsugu.Api.Enum;
 using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -14,15 +15,15 @@ public class DisplayedServerList : BaseCommand {
             .WithMatcher(ArgumentMatchers.ToServerEnumMatcher),
     ];
 
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         Server[] displayedServerList = args.GetVararg("displayedServerList")
             .Select(e => e.Get<Server>()).ToArray();
 
         await ctx.Tsugu.User.ChangeUserData(
-            ctx.TsuguUser.UserId, Constant.Platform,
+            ctx.TsuguUser.UserId, ctx.MessageContext.Platform,
             displayedServerList: displayedServerList
         );
 
-        await ctx.SendPlainText($"默认服务器排序已设定为：{string.Join(", ", displayedServerList.Select(e => e.ToChineseString()))}");
+        await ctx.ReplyPlainText($"默认服务器排序已设定为：{string.Join(", ", displayedServerList.Select(e => e.ToChineseString()))}");
     }
 }

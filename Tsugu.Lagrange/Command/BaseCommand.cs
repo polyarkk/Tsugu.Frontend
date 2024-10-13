@@ -1,18 +1,19 @@
 ﻿using System.Reflection;
 using System.Text;
 using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 
 namespace Tsugu.Lagrange.Command;
 
 public abstract class BaseCommand {
-    protected abstract Task InvokeInternal(Context ctx, ParsedArgs args);
+    protected abstract Task InvokeInternal(TsuguContext ctx, ParsedArgs args);
 
     /// <summary>
     /// 参数，注意可选参数一定要在必需参数之后，否则会出现异常
     /// </summary>
     protected virtual ArgumentMeta[] Arguments { get; } = [];
     
-    public async Task Invoke(Context ctx, List<string> tokens) {
+    public async Task Invoke(TsuguContext ctx, IReadOnlyList<string> tokens) {
         await InvokeInternal(ctx, new ParsedArgs(Arguments, tokens));
     }
 

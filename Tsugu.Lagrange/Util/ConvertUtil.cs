@@ -17,7 +17,7 @@ public static class ConvertUtil {
         if (type.IsEnum) {
             string str = Convert.ToString(o) ?? "null";
 
-            if (!Enum.TryParse(type, str, true, out converted)) {
+            if (!System.Enum.TryParse(type, str, true, out converted)) {
                 throw new FormatException($"failed to convert [{str}] to enum [{type.Name}]");
             }
         } else {

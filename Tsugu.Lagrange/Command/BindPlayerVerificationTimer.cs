@@ -7,6 +7,7 @@ using Tsugu.Api;
 using Tsugu.Api.Entity;
 using Tsugu.Api.Enum;
 using Tsugu.Api.Misc;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 using Timer = System.Timers.Timer;
 
@@ -22,11 +23,7 @@ public class BindPlayerVerificationTimer : Timer {
 
     private readonly string _backendUrl;
 
-    private readonly BotContext _botContext;
-
-    private readonly uint? _groupUin;
-
-    private readonly uint _friendUin;
+    private readonly IMessageContext _messageContext;
 
     private readonly uint _playerId;
 
@@ -41,20 +38,17 @@ public class BindPlayerVerificationTimer : Timer {
     private int _retriesRemaining;
 
     public BindPlayerVerificationTimer(
-        string backendUrl, BotContext botContext, uint? groupUin, uint friendUin, uint playerId, Server mainServer,
+        string backendUrl, IMessageContext messageContext, uint playerId, Server mainServer,
         bool unbind
     ) : base(15 * 1000) {
-        string userId = friendUin.ToString();
 
         // cancel previous unhandled request
-        if (Timers.TryGetValue(userId, out BindPlayerVerificationTimer? timer)) {
+        if (Timers.TryGetValue(messageContext.UserIdentifier, out BindPlayerVerificationTimer? timer)) {
             timer.Dispose();
         }
 
         _backendUrl = backendUrl;
-        _botContext = botContext;
-        _groupUin = groupUin;
-        _friendUin = friendUin;
+        _messageContext = messageContext;
         _playerId = playerId;
         _mainServer = mainServer;
         _unbind = unbind;
@@ -65,7 +59,7 @@ public class BindPlayerVerificationTimer : Timer {
         Elapsed += OnTimerElapsed;
         Enabled = true;
 
-        Timers[userId] = this;
+        Timers[messageContext.UserIdentifier] = this;
     }
 
     private void OnTimerElapsed(object? sender, ElapsedEventArgs _) {
@@ -76,10 +70,10 @@ public class BindPlayerVerificationTimer : Timer {
 
             using TsuguClient tsugu = new(_backendUrl);
 
-            string userId = _friendUin.ToString();
+            string userId = _messageContext.FriendId;
 
             Task task = tsugu.User.BindPlayerVerification(
-                userId, _mainServer, _playerId, Constant.Platform, _unbind
+                userId, _mainServer, _playerId, _messageContext.Platform, _unbind
             );
 
             try {
@@ -93,7 +87,7 @@ public class BindPlayerVerificationTimer : Timer {
                         
                         Logger.LogInformation(
                             "verifying binding player for [{uin} -> {playerId}] failed ({retries} retr{ies} remaining) with reason {reason}",
-                            _friendUin, _playerId, _retriesRemaining, _retriesRemaining == 1 ? "y" : "ies", message
+                            _messageContext.FriendId, _playerId, _retriesRemaining, _retriesRemaining == 1 ? "y" : "ies", message
                         );
 
                         return;
@@ -101,16 +95,16 @@ public class BindPlayerVerificationTimer : Timer {
 
                     Logger.LogInformation(
                         "verifying binding player for [{uin} -> {playerId}] failed with reason {reason}",
-                        _friendUin, _playerId, message
+                        _messageContext.FriendId, _playerId, message
                     );
 
-                    ReplyToUser(message + "，绑定失败！");
+                    _messageContext.ReplyPlainText(message + "，绑定失败！");
                 } else {
                     Logger.LogError("internal error while verifying binding player for [{uin} -> {playerId}]\n{e}",
-                        _friendUin, _playerId, e.ToString()
+                        _messageContext.FriendId, _playerId, e.ToString()
                     );
 
-                    ReplyToUser("绑定失败，后台异常！");
+                    _messageContext.ReplyPlainText("绑定失败，后台异常！");
                 }
 
                 Dispose();
@@ -123,10 +117,10 @@ public class BindPlayerVerificationTimer : Timer {
 
             // 若解绑且userPlayerIndex == userPlayerList.Length - 1，重置userPlayerIndex防止数组越界
             if (_unbind) {
-                TsuguUser user = tsugu.User.GetUserData(userId, Constant.Platform).Result;
+                TsuguUser user = tsugu.User.GetUserData(userId, _messageContext.Platform).Result;
 
                 if (user.UserPlayerIndex >= user.UserPlayerList.Length) {
-                    tsugu.User.ChangeUserData(userId, Constant.Platform, userPlayerIndex: 0).Wait();
+                    tsugu.User.ChangeUserData(userId, _messageContext.Platform, userPlayerIndex: 0).Wait();
 
                     if (user.UserPlayerList.Length > 0) {
                         reply += "（已重置主账号为第一个绑定的账号）";
@@ -134,20 +128,9 @@ public class BindPlayerVerificationTimer : Timer {
                 }
             }
 
-            ReplyToUser(reply);
+            _messageContext.ReplyPlainText(reply);
             Dispose();
         }
-    }
-
-    private void ReplyToUser(string text) {
-        _botContext
-            .SendMessage(
-                MessageUtil
-                    .GetDefaultMessageBuilder(_friendUin, _groupUin)
-                    .Text(text)
-                    .Build()
-            )
-            .Wait();
     }
 
     protected override void Dispose(bool disposing) {
@@ -157,7 +140,7 @@ public class BindPlayerVerificationTimer : Timer {
 
         Enabled = false;
         _disposed = true;
-        Timers.TryRemove(_friendUin.ToString(), out _);
+        Timers.TryRemove(_messageContext.UserIdentifier, out _);
         base.Dispose(disposing);
     }
 }

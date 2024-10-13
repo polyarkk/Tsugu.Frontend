@@ -1,6 +1,7 @@
 ﻿using Tsugu.Api.Entity;
 using Tsugu.Api.Enum;
 using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -21,7 +22,7 @@ public class PlayerStatus : BaseCommand {
             .WithMatcher(ArgumentMatchers.ToServerEnumMatcher),
     ];
 
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         uint index = args["index"].GetOr(() => 0u);
         Server? server = args["server"].GetOrNull<Server>();
 
@@ -38,7 +39,7 @@ public class PlayerStatus : BaseCommand {
         }
 
         if (index >= players.Length) {
-            await ctx.SendPlainText(
+            await ctx.ReplyPlainText(
                 (server != null ? $"服务器 [{server.Value.ToChineseString()}] " : "")
                 + $"未找到记录 {index}，请先绑定"
             );
@@ -48,6 +49,6 @@ public class PlayerStatus : BaseCommand {
 
         string base64 = await ctx.Tsugu.Query.SearchPlayer(players[0].PlayerId, players[0].Server);
 
-        await ctx.SendImage(base64);
+        await ctx.ReplyImage(base64);
     }
 }

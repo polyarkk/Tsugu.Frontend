@@ -1,4 +1,5 @@
 ﻿using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -12,14 +13,14 @@ public class ShareRoomNumber : BaseCommand {
         Argument<bool>("toggle", "是否开启"),
     ];
 
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         bool toggle = args["toggle"].Get<bool>();
 
         await ctx.Tsugu.User.ChangeUserData(
-            ctx.TsuguUser.UserId, Constant.Platform,
+            ctx.TsuguUser.UserId, ctx.MessageContext.Platform,
             shareRoomNumber: toggle
         );
 
-        await ctx.SendPlainText($"已{(toggle ? "开启" : "关闭")}个人车牌转发");
+        await ctx.ReplyPlainText($"已{(toggle ? "开启" : "关闭")}个人车牌转发");
     }
 }

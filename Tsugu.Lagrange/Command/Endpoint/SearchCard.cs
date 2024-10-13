@@ -1,4 +1,5 @@
 ﻿using Tsugu.Lagrange.Command.Argument;
+using Tsugu.Lagrange.Context;
 using Tsugu.Lagrange.Util;
 
 namespace Tsugu.Lagrange.Command.Endpoint;
@@ -16,7 +17,7 @@ public class SearchCard : BaseCommand {
         Argument<string>("keywords", "关键词"),
     ];
 
-    protected async override Task InvokeInternal(Context ctx, ParsedArgs args) {
+    protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.SearchCard(
             ctx.TsuguUser.DisplayedServerList,
             args.ConcatenatedArgs,
@@ -24,6 +25,6 @@ public class SearchCard : BaseCommand {
             ctx.AppSettings.Compress
         );
 
-        await ctx.SendImage(base64);
+        await ctx.ReplyImage(base64);
     }
 }
