@@ -59,7 +59,7 @@ public class QueryEndpoint(TsuguHttpClient client) {
     /// <param name="cardId">要获取卡面的卡牌 ID。</param>
     /// <returns>图片 Base64（拥有特训后图片的卡牌将同时返回特训前的特训后的图片）</returns>
     public async Task<string[]> GetCardIllustration(uint cardId) {
-        return await client.TsuguPost("/gachaSimulate", new { CardId = cardId });
+        return await client.TsuguPost("/getCardIllustration", new { CardId = cardId });
     }
 
     /// <summary>
