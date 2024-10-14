@@ -1,46 +1,28 @@
-﻿```shell
-git clone --recurse-submodules https://github.com/polyarkk/Tsugu.Lagrange
-```
-### TODO
+﻿### TODO
 
 - [x] Satori 支持
 - [ ] 聊天输出美化（Satori）
+- [ ] 上传车牌: 自动检测车牌并上传
+
+### 项目引用
+
+- [Satori.NET](https://github.com/bsdayo/Satori.NET)（[Forked](https://github.com/polyarkk/Satori.NET/tree/main)）
+- [Lagrange.Core](https://github.com/LagrangeDev/Lagrange.Core)
 
 ### 项目结构：
 
 - `Tsugu.Api`: 后端 API 调用类库
 - `Tsugu.Lagrange`: 机器人前端
 
-### 可用指令
+### 构建
 
-#### 查询类
+```shell
+git clone --recurse-submodules https://github.com/polyarkk/Tsugu.Lagrange
+cd Tsugu.Lagrange/Tsugu.Lagrange
 
-- 查试炼│查stage│查舞台│查festival│查5v5: 查询活动的试炼信息
-- 抽卡模拟│卡池模拟: 就像真的抽卡一样
-- 查卡面│查插画: 根据卡面ID查询卡面插画
-- 历史预测线 | lsycx: 查询指定档位的预测线与最近的4期活动类型相同的活动的档线数据
-- 查卡池: 根据卡池ID查询卡池信息
-- 查角色: 根据角色名、乐队、昵称等查询角色信息
-- 查活动: 根据活动名、乐队、活动ID等查询活动信息
-- 查卡: 根据卡面ID、角色名、乐队、昵称等查询卡面信息
-- 查玩家│查询玩家: 根据玩家ID、服务器查询玩家信息
-- 随机曲: 根据关键词或曲目ID随机曲目信息
-- 查曲: 根据关键词或曲目ID查询曲目信息
-- 查谱面│查铺面: 根据曲目ID与难度查询铺面信息
-- 查询分数表│查分数表│查询分数榜│查分数榜:
-- ycxall│ycx all: 输出全部档位的预测线
-- ycx│预测线: 指定档位的预测线
+# for linux, single file, including runtime
+dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true
 
-#### 用户数据类
-
-- 绑定/解绑玩家: 绑定/解绑游戏账号
-- 设置默认服务器│默认服务器: 设定信息显示中的默认服务器排序
-- 主服务器│设置主服务器: 将指定的服务器设置为你的主服务器
-- 车牌转发│开启/关闭个人车牌转发:
-- 玩家状态: 查询自己的玩家状态
-- 主账号: 设定默认玩家状态、车牌展示中的主账号使用第几个账号
-
-#### 车站类(TODO)
-
-- [x] ycm│车来│有车吗: 获取车站信息
-- [ ] 上传车牌: 自动检测车牌并上传
+# for windows, single file, including runtime
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
+```
