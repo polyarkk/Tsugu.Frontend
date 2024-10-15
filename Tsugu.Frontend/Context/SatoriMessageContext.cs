@@ -15,7 +15,7 @@ public class SatoriMessageContext : IMessageContext {
     public SatoriMessageContext(SatoriBot satoriBot, Event e) {
         _satoriBot = satoriBot;
 
-        Platform = e.Platform is "qq" or "onebot" or "chronocat" ? "red" : e.Platform;
+        Platform = e.Platform;
         BotId = satoriBot.SelfId;
 
         _sessionId = e.Channel!.Id;

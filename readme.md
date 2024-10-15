@@ -83,7 +83,7 @@ dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=
 
 > 对于协议名：只有`satori`、`lagrange`
 > 
-> 配置群组、用户、管理员时，对于Onebot、Chronocat、Lagrange，平台名都为`red`
+> 对于`lagrange`协议，平台名只能为`red`
 
 - `Whitelisted`：是否启用白名单模式，启用后将只对***群聊只有`Group`中列出的群组***，***私聊只有`Friends`中列出的好友***返回消息。
 - `BackendUrl`：Tsugu 后端地址
