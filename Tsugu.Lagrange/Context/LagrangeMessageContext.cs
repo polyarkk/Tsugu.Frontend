@@ -13,8 +13,11 @@ public class LagrangeMessageContext : IMessageContext {
     public LagrangeMessageContext(BotContext botContext, MessageChain messageChain, MessageSource messageSource) {
         _botContext = botContext;
 
+        BotId = botContext.BotUin.ToString();
+        
         FriendId = messageChain.FriendUin.ToString();
         FriendName = messageChain.FriendInfo?.Nickname ?? FriendId;
+        
         GroupId = messageChain.GroupUin?.ToString();
         GroupName = GroupId;
         StringifiedContent = messageChain.ToPreviewText();
@@ -41,6 +44,8 @@ public class LagrangeMessageContext : IMessageContext {
     
     public string Platform => "red";
     
+    public string BotId { get; }
+    
     public string FriendName { get; }
 
     public string FriendId { get; }
@@ -48,7 +53,7 @@ public class LagrangeMessageContext : IMessageContext {
     public string? GroupName { get; }
 
     public string? GroupId { get; }
-    
+
     public bool MentionedMe { get; }
 
     public string StringifiedContent { get; }

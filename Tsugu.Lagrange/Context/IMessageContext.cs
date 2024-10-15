@@ -9,6 +9,8 @@ public interface IMessageContext {
     
     string Platform { get; }
     
+    string BotId { get; }
+    
     string FriendName { get; }
     
     string FriendId { get; }

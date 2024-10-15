@@ -10,18 +10,24 @@ namespace Tsugu.Lagrange.Context;
 public class SatoriMessageContext : IMessageContext {
     private readonly SatoriBot _satoriBot;
 
-    private readonly string _userId;
+    private readonly string _sessionId;
 
     public SatoriMessageContext(SatoriBot satoriBot, Event e) {
         _satoriBot = satoriBot;
 
-        Platform = e.Platform;
-        _userId = e.User?.Id!;
-        FriendId = e.Channel?.Id!;
-        FriendName = e.User?.Name ?? _userId;
+        Platform = e.Platform is "qq" or "onebot" or "chronocat" ? "red" : e.Platform;
+        BotId = satoriBot.SelfId;
+
+        _sessionId = e.Channel!.Id;
+        
+        FriendId = e.User?.Id!;
+        FriendName = e.User?.Name!;
+        
         GroupId = e.Guild?.Id;
-        GroupName = e.Guild?.Name ?? e.Channel?.Name ?? GroupId;
+        GroupName = e.Guild?.Name;
+        
         StringifiedContent = e.Message?.Content ?? "";
+
         MessageSource = e.Channel?.Type == ChannelType.Text ? MessageSource.Friend : MessageSource.Group;
 
         List<string> textOnlyTokens = [];
@@ -44,10 +50,11 @@ public class SatoriMessageContext : IMessageContext {
     public string Protocol => "satori";
 
     public string Platform { get; }
+    
+    public string BotId { get; }
 
     public string FriendName { get; }
 
-    // 实际为频道ID
     public string FriendId { get; }
 
     public string? GroupName { get; }
@@ -63,11 +70,11 @@ public class SatoriMessageContext : IMessageContext {
     public MessageSource MessageSource { get; }
 
     public async Task ReplyPlainText(string text) {
-        await _satoriBot.CreateMessageAsync(FriendId, GetDefaultElement(new TextElement { Text = text }));
+        await _satoriBot.CreateMessageAsync(_sessionId, GetDefaultElement(new TextElement { Text = text }));
     }
 
     public async Task ReplyImage(params string[] base64List) {
-        await _satoriBot.CreateMessageAsync(FriendId,
+        await _satoriBot.CreateMessageAsync(_sessionId,
             GetDefaultElement(
                 (
                     from b in base64List
@@ -96,7 +103,7 @@ public class SatoriMessageContext : IMessageContext {
         List<Element> e = [];
 
         if (MessageSource == MessageSource.Group) {
-            e.Add(new AtElement { Id = _userId });
+            e.Add(new AtElement { Id = FriendId });
         }
 
         e.AddAll(elements);

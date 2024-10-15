@@ -37,10 +37,19 @@ public class AppSettings {
     /// </summary>
     public string[] Admins { get; set; } = [];
 
+    public LagrangeConfig Lagrange { get; set; } = new();
+
     /// <summary>
     /// Satori 配置
     /// </summary>
     public SatoriConfig Satori { get; set; } = new();
+
+    public class LagrangeConfig {
+        /// <summary>
+        /// 是否启用 Lagrange
+        /// </summary>
+        public bool Enabled { get; set; } = true;
+    }
     
     public class SatoriConfig {
         /// <summary>

@@ -72,6 +72,6 @@ internal class SatoriHostedService : IHostedService, IDisposable {
     }
 
     public void Dispose() {
-        _client.Dispose();
+        ((SatoriClient?)_client)?.Dispose();
     }
 }

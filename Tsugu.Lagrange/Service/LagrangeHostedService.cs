@@ -5,6 +5,7 @@ using Lagrange.Core.Common.Interface.Api;
 using Lagrange.Core.Event;
 using Lagrange.Core.Event.EventArg;
 using Lagrange.Core.Message;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using QRCoder;
@@ -27,12 +28,20 @@ internal class LagrangeHostedService : IHostedService, IDisposable {
 
     private bool _needQrCodeLogin;
 
-    public LagrangeHostedService(ILogger<LagrangeHostedService> logger, FilterService filterService) {
+    private AppSettings _appSettings;
+
+    public LagrangeHostedService(
+        IConfiguration configuration,
+        ILogger<LagrangeHostedService> logger,
+        FilterService filterService
+    ) {
+        _appSettings = configuration.GetSection("Tsugu").Get<AppSettings>()!;
         _logger = logger;
+
         _logger.LogInformation("--- TSUGU LAGRANGE FRONTEND IS NOW STARTING!!! ---");
         _filterService = filterService;
         _gcTimer = new Timer(_ => GC.Collect(), null, TimeSpan.FromMinutes(30), TimeSpan.FromMinutes(30));
-        
+
         BotDeviceInfo deviceInfo;
 
         if (!File.Exists("device.dat")) {
@@ -68,7 +77,9 @@ internal class LagrangeHostedService : IHostedService, IDisposable {
     }
 
     public async Task StartAsync(CancellationToken cancellationToken) {
-        await Login();
+        if (_appSettings.Lagrange.Enabled) {
+            await Login();
+        }
     }
 
     public Task StopAsync(CancellationToken cancellationToken) {
@@ -158,15 +169,6 @@ internal class LagrangeHostedService : IHostedService, IDisposable {
             chain = ge.Chain;
             source = MessageSource.Group;
         } else {
-            return;
-        }
-
-        if (chain.FriendUin == ctx.BotUin) {
-            return;
-        }
-
-        // ignore official bot
-        if (chain.FriendUin == 3889000770) {
             return;
         }
 

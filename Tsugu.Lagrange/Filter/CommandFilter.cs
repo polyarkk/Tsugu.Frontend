@@ -1,7 +1,4 @@
-﻿using Lagrange.Core;
-using Lagrange.Core.Message;
-using Lagrange.Core.Message.Entity;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 using System.Text;
@@ -25,9 +22,7 @@ public class CommandFilter : IFilter {
 
     private readonly IConfiguration _configuration;
 
-    public CommandFilter(
-        IConfiguration configuration
-    ) {
+    public CommandFilter(IConfiguration configuration) {
         _commands = new Dictionary<string, BaseCommand>();
         _appSettings = configuration.GetSection("Tsugu").Get<AppSettings>()!;
         _configuration = configuration;
@@ -36,29 +31,38 @@ public class CommandFilter : IFilter {
     }
 
     public async Task DoFilterAsync(IMessageContext messageContext) {
-        if ((messageContext.MessageSource == MessageSource.Friend &&
-                !_appSettings.IsFriendAllowed(messageContext.UserIdentifier)
-            ) || (messageContext.MessageSource == MessageSource.Group &&
-                !_appSettings.IsGroupAllowed(messageContext.Protocol, messageContext.Platform,
-                    messageContext.GroupId
-                )
-            )
-        ) {
-            Logger.LogInformation("message from [{uid}] won't handle because friend or group is not whitelisted",
-                messageContext.UserIdentifier
-            );
-
+        // ignore official bot
+        if (messageContext.FriendId == "3889000770") {
             return;
         }
 
-        if (messageContext.MessageSource == MessageSource.Group
-            && _appSettings.NeedMentioned && !messageContext.MentionedMe
-        ) {
-            Logger.LogInformation("message from [{uid}] won't handle because it did not mention bot",
-                messageContext.UserIdentifier
-            );
+        bool sendByOwn = messageContext.BotId == messageContext.FriendId;
 
-            return;
+        if (!sendByOwn) {
+            if ((messageContext.MessageSource == MessageSource.Friend &&
+                    !_appSettings.IsFriendAllowed(messageContext.UserIdentifier)
+                ) || (messageContext.MessageSource == MessageSource.Group &&
+                    !_appSettings.IsGroupAllowed(messageContext.Protocol, messageContext.Platform,
+                        messageContext.GroupId
+                    )
+                )
+            ) {
+                Logger.LogInformation("message from [{uid}] won't handle because friend or group is not whitelisted",
+                    messageContext.UserIdentifier
+                );
+
+                return;
+            }
+
+            if (messageContext.MessageSource == MessageSource.Group
+                && _appSettings.NeedMentioned && !messageContext.MentionedMe
+            ) {
+                Logger.LogInformation("message from [{uid}] won't handle because it did not mention bot",
+                    messageContext.UserIdentifier
+                );
+
+                return;
+            }
         }
 
         using TsuguContext tsuguContext = new(_appSettings, messageContext);
@@ -67,9 +71,20 @@ public class CommandFilter : IFilter {
             return;
         }
 
+        string alias = tsuguContext.MessageContext.TextOnlyTokens[0];
+
+        // 自身消息强制需要加"!"前缀
+        if (sendByOwn) {
+            if (!alias.StartsWith('!')) {
+                return;
+            }
+
+            alias = alias.Length >= 1 ? alias[1..] : "";
+        }
+
         bool isAdmin = _appSettings.Admins.Contains(messageContext.UserIdentifier);
 
-        if (isAdmin && string.Equals(tsuguContext.MessageContext.TextOnlyTokens[0], "tsugu_reload_appsettings",
+        if (isAdmin && string.Equals(alias, "tsugu_reload_appsettings",
             StringComparison.OrdinalIgnoreCase
         )) {
             _appSettings = _configuration.GetSection("Tsugu").Get<AppSettings>()!;
@@ -80,7 +95,7 @@ public class CommandFilter : IFilter {
         }
 
 #if DEBUG
-        if (isAdmin && string.Equals(tsuguContext.MessageContext.TextOnlyTokens[0], "tsugu_reload_commands",
+        if (isAdmin && string.Equals(alias, "tsugu_reload_commands",
             StringComparison.OrdinalIgnoreCase
         )) {
             LoadEndpoints();
@@ -91,7 +106,7 @@ public class CommandFilter : IFilter {
         }
 #endif
 
-        if (string.Equals(tsuguContext.MessageContext.TextOnlyTokens[0], "tsugu_help",
+        if (string.Equals(alias, "tsugu_help",
             StringComparison.OrdinalIgnoreCase
         )) {
             await tsuguContext.ReplyPlainText(
@@ -101,7 +116,7 @@ public class CommandFilter : IFilter {
             return;
         }
 
-        if (!_commands.TryGetValue(tsuguContext.MessageContext.TextOnlyTokens[0], out BaseCommand? api)) {
+        if (!_commands.TryGetValue(alias, out BaseCommand? api)) {
             return;
         }
 
