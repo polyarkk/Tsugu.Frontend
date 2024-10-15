@@ -5,6 +5,7 @@
 
 Satori.NET
 .idea
+**/Playground.cs
 
 # User-specific files
 *.rsuser
@@ -399,4 +400,3 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-Tsugu.Lagrange/Playground.cs

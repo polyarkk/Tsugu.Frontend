@@ -13,13 +13,13 @@
 ### 项目结构：
 
 - `Tsugu.Api`: 后端 API 调用类库
-- `Tsugu.Lagrange`: 机器人前端
+- `Tsugu.Frontend`: 机器人前端
 
 ### 构建
 
 ```shell
-git clone --recurse-submodules https://github.com/polyarkk/Tsugu.Lagrange
-cd Tsugu.Lagrange/Tsugu.Lagrange
+git clone --recurse-submodules https://github.com/polyarkk/Tsugu.Frontend
+cd Tsugu.Frontend/Tsugu.Frontend
 
 # for linux, single file, including runtime
 dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true
