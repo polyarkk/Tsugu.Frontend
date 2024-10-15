@@ -1,4 +1,4 @@
-﻿# <p style="text-align:center;">🟢Tsugu.Frontend🟢</p>
+# <p align="center">🟢Tsugu.Frontend🟢</p>
 
 ### TODO
 
