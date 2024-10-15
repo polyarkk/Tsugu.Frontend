@@ -46,17 +46,17 @@ dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=
     "NeedMentioned": true,
     "Groups": [
       "lagrange:red:114514",
-      "satori:red:114514",
+      "satori:onebot:114514",
       "satori:kook:114514"
     ],
     "Friends": [
       "lagrange:red:114514",
-      "satori:red:114514",
+      "satori:onebot:114514",
       "satori:kook:114514"
     ],
     "Admins": [
       "lagrange:red:114514",
-      "satori:red:114514",
+      "satori:onebot:114514",
       "satori:kook:114514"
     ],
     "Lagrange": {
