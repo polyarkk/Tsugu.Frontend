@@ -27,7 +27,7 @@ public class EventStage : BaseCommand {
         string base64 = await ctx.Tsugu.Query.EventStage(
             args["mainServer"].GetOr(() => ctx.TsuguUser.MainServer),
             args["eventId"].GetOrNull<uint>(),
-            args["meta"].GetOr(() => false),
+            args["meta"].GetOr(false),
             ctx.AppSettings.Compress
         );
 

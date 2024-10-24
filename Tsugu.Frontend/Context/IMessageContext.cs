@@ -36,4 +36,6 @@ public interface IMessageContext {
     Task ReplyPlainText(string text);
 
     Task ReplyImage(params string[] base64List);
+
+    Task ReplyPoke();
 }

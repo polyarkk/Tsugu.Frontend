@@ -2,7 +2,6 @@
 using Tsugu.Api.Enum;
 using Tsugu.Frontend.Command.Argument;
 using Tsugu.Frontend.Context;
-using Tsugu.Frontend.Util;
 
 namespace Tsugu.Frontend.Command.Endpoint;
 
@@ -23,7 +22,7 @@ public class PlayerStatus : BaseCommand {
     ];
 
     protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
-        uint index = args["index"].GetOr(() => 0u);
+        uint index = args["index"].GetOr(0u);
         Server? server = args["server"].GetOrNull<Server>();
 
         TsuguUser.TsuguUserServerInList[] players;
@@ -47,7 +46,7 @@ public class PlayerStatus : BaseCommand {
             return;
         }
 
-        string base64 = await ctx.Tsugu.Query.SearchPlayer(players[0].PlayerId, players[0].Server);
+        string base64 = await ctx.Tsugu.Query.SearchPlayer(players[index].PlayerId, players[index].Server);
 
         await ctx.ReplyImage(base64);
     }

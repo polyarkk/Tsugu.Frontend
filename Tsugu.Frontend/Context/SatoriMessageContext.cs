@@ -86,6 +86,11 @@ public class SatoriMessageContext : IMessageContext {
         );
     }
 
+    public async Task ReplyPoke() {
+        // not supported
+        await Task.Delay(0);
+    }
+
     private static string WhichTypeOfImageIsThis(string base64) {
         string data = base64[..5];
 

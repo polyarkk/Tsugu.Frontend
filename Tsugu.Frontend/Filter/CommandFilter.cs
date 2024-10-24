@@ -33,6 +33,8 @@ public class CommandFilter : IFilter {
     public async Task DoFilterAsync(IMessageContext messageContext) {
         // ignore official bot
         if (messageContext.FriendId == "3889000770") {
+            await messageContext.ReplyPoke();
+            
             return;
         }
 

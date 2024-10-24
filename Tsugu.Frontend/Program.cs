@@ -30,6 +30,7 @@ if (!File.Exists("appsettings.json")) {
 }
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+builder.Configuration.AddJsonFile("appsettings.json");
 
 builder.Services.AddScoped<FilterService>();
 builder.Services.AddHostedService<LagrangeHostedService>();
@@ -39,8 +40,6 @@ builder.Logging.ClearProviders()
     .AddSimpleConsole(options => {
         options.TimestampFormat = "yyyy-MM-dd HH:mm:ss";
     });
-
-builder.Configuration.AddJsonFile("appsettings.json");
 
 IHost host = builder.Build();
 

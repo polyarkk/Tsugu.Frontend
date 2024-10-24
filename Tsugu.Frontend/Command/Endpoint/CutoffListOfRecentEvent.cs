@@ -1,6 +1,6 @@
-﻿using Tsugu.Frontend.Command.Argument;
+﻿using Tsugu.Api.Enum;
+using Tsugu.Frontend.Command.Argument;
 using Tsugu.Frontend.Context;
-using Tsugu.Frontend.Util;
 
 namespace Tsugu.Frontend.Command.Endpoint;
 
@@ -12,11 +12,12 @@ public class CutoffListOfRecentEvent : BaseCommand {
     protected override ArgumentMeta[] Arguments { get; } = [
         Argument<uint>("tier", "档位"),
         Argument<uint>("eventId", "活动ID").AsOptional(),
+        Argument<Server>("server", "服务器").AsOptional(),
     ];
 
     protected async override Task InvokeInternal(TsuguContext ctx, ParsedArgs args) {
         string base64 = await ctx.Tsugu.Query.CutoffListOfRecentEvent(
-            ctx.TsuguUser.MainServer,
+            args["server"].GetOr(() => ctx.TsuguUser.MainServer),
             args["tier"].Get<uint>(),
             args["eventId"].GetOrNull<uint>(),
             ctx.AppSettings.Compress

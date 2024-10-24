@@ -7,10 +7,8 @@ public static class ArgumentMatchers {
         return str switch {
             "日服" => Server.Jp,
             "国际服" => Server.En,
-            "台服" => Server.Tw,
-            "繁中服" => Server.Tw,
-            "国服" => Server.Cn,
-            "简中服" => Server.Cn,
+            "台服" or "繁中服" => Server.Tw,
+            "国服" or "简中服" => Server.Cn,
             "韩服" => Server.Kr,
             null => null,
             _ => System.Enum.Parse<Server>(str, true),

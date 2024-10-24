@@ -26,8 +26,10 @@ public class FilterService {
         foreach (IFilter filter in _filters) {
             try {
                 await filter.DoFilterAsync(messageContext);
-            } catch (Exception ex) {
-                _logger.LogError("exception raised upon handling filter [{filter}]!\n{e}", filter.GetType().Name, ex.ToString());
+            } catch (Exception e) {
+                _logger.LogError("exception raised upon handling filter [{filter}], aborted!\n{e}", filter.GetType().Name, e.ToString());
+                
+                return;
             }
         }
     }

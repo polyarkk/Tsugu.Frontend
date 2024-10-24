@@ -133,6 +133,20 @@ public class ParsedArgs {
         }
 
         /// <summary>
+        /// <inheritdoc cref="Get{TTo}"/>，若为 null 则使用指定值替代，注意替代值会被提前获取，如需减少开销应使用<see cref="GetOr{TTo}(System.Func{TTo})"/>
+        /// </summary>
+        /// <param name="fallback">替代值</param>
+        /// <typeparam name="TTo"><inheritdoc cref="Get{TTo}"/></typeparam>
+        /// <returns><inheritdoc cref="Get{TTo}"/></returns>
+        public TTo GetOr<TTo>(TTo fallback) where TTo : struct {
+            if (_item == null) {
+                return fallback;
+            }
+
+            return (TTo)_item;
+        }
+
+        /// <summary>
         /// <inheritdoc cref="Get{TTo}"/>，得到的元素可能为 null
         /// </summary>
         /// <typeparam name="TTo"><inheritdoc cref="Get{TTo}"/></typeparam>

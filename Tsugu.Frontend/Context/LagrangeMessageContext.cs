@@ -76,6 +76,12 @@ public class LagrangeMessageContext : IMessageContext {
         await _botContext.SendMessage(mb.Build());
     }
 
+    public async Task ReplyPoke() {
+        _ = MessageSource == MessageSource.Group
+            ? await _botContext.GroupPoke(uint.Parse(GroupId!), uint.Parse(FriendId))
+            : await _botContext.FriendPoke(uint.Parse(FriendId));
+    }
+
     private MessageBuilder GetDefaultMessageBuilder() {
         return MessageSource == MessageSource.Group
             ? MessageBuilder.Group(uint.Parse(GroupId!)).Mention(uint.Parse(FriendId))

@@ -28,7 +28,7 @@ internal class LagrangeHostedService : IHostedService, IDisposable {
 
     private bool _needQrCodeLogin;
 
-    private AppSettings _appSettings;
+    private readonly AppSettings _appSettings;
 
     public LagrangeHostedService(
         IConfiguration configuration,
@@ -155,6 +155,8 @@ internal class LagrangeHostedService : IHostedService, IDisposable {
 
         _botContext.Invoker.OnFriendMessageReceived += OnMessageReceived;
         _botContext.Invoker.OnGroupMessageReceived += OnMessageReceived;
+        _botContext.Invoker.OnGroupPokeEvent += OnPokeEvent;
+        _botContext.Invoker.OnFriendPokeEvent += OnPokeEvent;
     }
 
     private async void OnMessageReceived<TMessageEvent>(BotContext ctx, TMessageEvent e)
@@ -173,5 +175,31 @@ internal class LagrangeHostedService : IHostedService, IDisposable {
         }
 
         await _filterService.InvokeFilters(new LagrangeMessageContext(ctx, chain, source));
+    }
+
+    private async void OnPokeEvent<TPokeEvent>(BotContext ctx, TPokeEvent e) {
+        uint attacker, victim;
+        uint? groupUin = null;
+        
+        if (e is FriendPokeEvent fpe) {
+            attacker = fpe.OperatorUin;
+            victim = fpe.TargetUin;
+        } else if (e is GroupPokeEvent gpe) {
+            attacker = gpe.OperatorUin;
+            victim = gpe.TargetUin;
+            groupUin = gpe.GroupUin;
+        } else {
+            return;
+        }
+
+        if (victim != ctx.BotUin || attacker == victim) {
+            return;
+        }
+
+        if (groupUin == null) {
+            await ctx.FriendPoke(attacker);
+        } else {
+            await ctx.GroupPoke((uint)groupUin, attacker);
+        }
     }
 }
