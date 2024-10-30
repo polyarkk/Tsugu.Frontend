@@ -3,7 +3,7 @@
 public class Room {
     public Room(
         uint number, string rawMessage, string source,
-        uint userId, ulong time, Player player, 
+        string userId, ulong time, Player? player, 
         string? avatarUrl, string? userName
     ) {
         Number = number;
@@ -22,11 +22,11 @@ public class Room {
 
     public string Source { get; set; }
 
-    public uint UserId { get; set; }
+    public string UserId { get; set; }
 
     public ulong Time { get; set; }
 
-    public Player Player { get; set; }
+    public Player? Player { get; set; }
 
     public string? AvatarUrl { get; set; }
 

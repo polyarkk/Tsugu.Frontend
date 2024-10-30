@@ -56,7 +56,11 @@ public class TsuguHttpClient : HttpClient {
             throw new EndpointCallException(stationRestResponse.Data.GetString());
         }
 
-        return stationRestResponse.Data.DeserializeJson<T>()!;
+        try {
+            return stationRestResponse.Data.DeserializeJson<T>()!;
+        } catch (Exception e) {
+            throw new Exception($"cannot deserialize result! endpoint: {method} {endpoint}, body: {stationRestResponse.Data.ToString()}", e);
+        }
     }
 
     /// <inheritdoc cref="StationSend{T}"/>
